@@ -1,37 +1,30 @@
 <!DOCTYPE html>
-<html lang="pt-PT">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tatá Nail Details - Agendamento</title>
     
-    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Google Fonts: Exo 2 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;700;900&display=swap" rel="stylesheet">
     
-    <!-- Supabase JS Client -->
     <script type="module">
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+        // As suas chaves Supabase - Mantenha-as aqui. A chave 'anon' é segura para ser exposta.
         window.supabase = createClient(
-            'https://lshlzlorcvuadctmhuzu.supabase.co', // <-- SUA SUPABASE URL
-            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxzaGx6bG9yY3Z1YWRjdG1odXp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA5ODk2MzMsImV4cCI6MjA2NjU2NTYzM30.ybPLY1dsuPhAq_mR4z2OiFHSv6B0HkzsVmfrs5Bs5XY' // Sua Chave Anon (Pública)
+            'https://lshlzlorcvuadctmhuzu.supabase.co',
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxzaGx6bG9yY3Z1YWRjdG1odXp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA5ODk2MzMsImV4cCI6MjA2NjU2NTYzM30.ybPLY1dsuPhAq_mR4z2OiFHSv6B0HkzsVmfrs5Bs5XY'
         );
     </script>
 
     <style>
-        /* Estilos para a fonte Exo 2 e o botão glossy */
+        /* Estilos personalizados mantidos para o botão e a fonte global */
         body {
             font-family: 'Exo 2', sans-serif;
-            background-color: #fce4ec; /* Fundo rosa claro */
         }
-        .font-exo {
-            font-family: 'Exo 2', sans-serif;
-        }
-
         .glossy-button {
             background: linear-gradient(145deg, #ff80ab, #f8bbd0);
             border: 2px solid rgba(255, 255, 255, 0.6);
@@ -55,57 +48,53 @@
 </head>
 <body class="bg-pink-50 text-gray-800">
 
-    <!-- ========== VISTA DO CLIENTE ========== -->
-    <div id="client-view" class="min-h-screen flex flex-col items-center justify-center p-4 text-center">
-        <h1 class="text-5xl md:text-7xl font-black text-pink-500 font-exo uppercase tracking-wider mb-4" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.1);">Tatá Nail Details</h1>
+    <main id="client-view" class="min-h-screen flex flex-col items-center justify-center p-4 text-center">
+        <h1 class="text-5xl md:text-7xl font-black text-pink-500 uppercase tracking-wider mb-4" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.1);">Tatá Nail Details</h1>
         <p class="text-xl text-gray-600 mb-12">O seu momento de brilhar começa aqui.</p>
         
-        <button id="open-schedule-modal-btn" class="glossy-button font-exo text-4xl font-bold uppercase tracking-widest py-6 px-16 rounded-full">
+        <button id="open-schedule-modal-btn" class="glossy-button text-4xl font-bold uppercase tracking-widest py-6 px-16 rounded-full">
             Agenda
         </button>
 
-        <button id="go-to-admin-login-btn" class="fixed bottom-4 right-4 bg-gray-700 text-white text-xs py-1 px-3 rounded-full shadow-lg hover:bg-gray-800 transition">
-            Área Administrativa
-        </button>
-    </div>
+        <footer class="fixed bottom-4 right-4">
+             <button id="go-to-admin-login-btn" class="bg-gray-700 text-white text-xs py-1 px-3 rounded-full shadow-lg hover:bg-gray-800 transition">
+                Área Administrativa
+            </button>
+        </footer>
+    </main>
 
-    <!-- ========== VISTA DE LOGIN DO ADMIN ========== -->
-    <div id="admin-login-view" class="min-h-screen hidden flex-col items-center justify-center p-4 bg-gray-100">
+    <main id="admin-login-view" class="min-h-screen hidden flex-col items-center justify-center p-4 bg-gray-100">
         <div class="w-full max-w-sm bg-white p-8 rounded-2xl shadow-xl">
             <h2 class="text-3xl font-bold text-center text-pink-500 mb-8">Acesso Admin</h2>
-            <div id="login-error-message" class="hidden text-red-500 bg-red-100 p-3 rounded-lg mb-4 text-sm"></div>
+            <div id="login-error-message" class="hidden p-3 rounded-lg mb-4 text-sm"></div>
             <form id="login-form">
                 <div class="mb-4">
-                    <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Usuário</label>
-                    <input type="text" id="username" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-pink-500 focus:border-pink-500" required value="tata">
+                    <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <input type="email" id="email-login" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-pink-500 focus:border-pink-500" required value="tata@example.com" autocomplete="email">
                 </div>
                 <div class="mb-6">
                     <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Senha</label>
-                    <input type="password" id="password" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-pink-500 focus:border-pink-500" required value="tata0000">
+                    <input type="password" id="password-login" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-pink-500 focus:border-pink-500" required value="tata0000" autocomplete="current-password">
                 </div>
-                <button type="submit" class="w-full bg-pink-500 text-white py-3 rounded-lg font-bold hover:bg-pink-600 transition-colors">Entrar</button>
+                <button type="submit" id="login-submit-btn" class="w-full bg-pink-500 text-white py-3 rounded-lg font-bold hover:bg-pink-600 transition-colors disabled:opacity-50">Entrar</button>
             </form>
             <button id="back-to-client-view-btn" class="w-full mt-4 bg-gray-200 text-gray-700 py-2 rounded-lg text-sm hover:bg-gray-300 transition">Voltar</button>
         </div>
-    </div>
+    </main>
 
-    <!-- ========== PAINEL ADMINISTRATIVO ========== -->
     <div id="admin-panel-view" class="min-h-screen hidden bg-gray-100">
-        <!-- Header -->
         <header class="bg-white shadow-md p-4 flex justify-between items-center sticky top-0 z-10">
             <h1 class="text-2xl font-bold text-pink-500">Painel Administrativo</h1>
             <button id="logout-btn" class="bg-red-500 text-white py-2 px-4 rounded-lg font-bold hover:bg-red-600 transition">Sair</button>
         </header>
 
-        <!-- Mensagem de Próximos Clientes -->
-        <div id="todays-appointments-alert" class="hidden m-4 p-4 bg-blue-100 border-l-4 border-blue-500 text-blue-700 rounded-r-lg relative">
-            <button id="close-alert-btn" class="absolute top-1 right-2 text-xl font-bold">&times;</button>
-            <p class="font-bold mb-2">Próximos Clientes do Dia:</p>
-            <ul id="todays-appointments-list" class="list-disc list-inside text-sm"></ul>
-        </div>
+        <main class="p-4">
+            <div id="todays-appointments-alert" class="hidden m-4 p-4 bg-blue-100 border-l-4 border-blue-500 text-blue-700 rounded-r-lg relative">
+                <button id="close-alert-btn" class="absolute top-1 right-2 text-xl font-bold">&times;</button>
+                <p class="font-bold mb-2">Próximos Clientes do Dia:</p>
+                <ul id="todays-appointments-list" class="list-disc list-inside text-sm"></ul>
+            </div>
 
-        <!-- Abas de Navegação -->
-        <div class="p-4">
             <div class="border-b border-gray-200">
                 <nav id="admin-tabs" class="-mb-px flex space-x-8" aria-label="Tabs">
                     <button data-tab="services" class="admin-tab whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-pink-500 text-pink-600">Serviços</button>
@@ -114,10 +103,8 @@
                 </nav>
             </div>
 
-            <!-- Conteúdo das Abas -->
             <div class="mt-8">
-                <!-- Aba Serviços -->
-                <div id="services-tab-content" class="admin-tab-content">
+                <section id="services-tab-content" class="admin-tab-content">
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                         <div class="md:col-span-1 bg-white p-6 rounded-xl shadow-lg">
                             <h3 id="service-form-title" class="text-xl font-bold mb-4">Adicionar Novo Serviço</h3>
@@ -133,7 +120,7 @@
                                 </div>
                                 <div class="mb-4">
                                     <label for="service-price" class="block text-sm font-medium">Preço (R$)</label>
-                                    <input type="number" step="0.01" id="service-price" class="mt-1 w-full p-2 border rounded-md" required>
+                                    <input type="number" step="0.01" id="service-price" inputmode="decimal" class="mt-1 w-full p-2 border rounded-md" required>
                                 </div>
                                 <button type="submit" class="w-full bg-green-500 text-white py-2 rounded-md font-bold hover:bg-green-600">Salvar Serviço</button>
                                 <button type="button" id="cancel-edit-btn" class="hidden w-full mt-2 bg-gray-400 text-white py-2 rounded-md hover:bg-gray-500">Cancelar Edição</button>
@@ -145,7 +132,6 @@
                                 <table class="min-w-full divide-y divide-gray-200">
                                     <thead class="bg-gray-50">
                                         <tr>
-                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
                                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Serviço</th>
                                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Duração</th>
                                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Preço</th>
@@ -153,16 +139,14 @@
                                         </tr>
                                     </thead>
                                     <tbody id="services-table-body" class="bg-white divide-y divide-gray-200">
-                                        <!-- Linhas de serviço serão injetadas aqui -->
-                                    </tbody>
+                                        </tbody>
                                 </table>
                             </div>
                         </div>
                     </div>
-                </div>
+                </section>
 
-                <!-- Aba Agenda -->
-                <div id="agenda-tab-content" class="admin-tab-content hidden">
+                <section id="agenda-tab-content" class="admin-tab-content hidden">
                     <div class="bg-white p-6 rounded-xl shadow-lg mb-8">
                         <h3 class="text-xl font-bold mb-4">Gerir Disponibilidade</h3>
                         <div class="flex flex-wrap items-end gap-4">
@@ -170,22 +154,21 @@
                                 <label for="availability-date" class="block text-sm font-medium">Selecionar Data</label>
                                 <input type="date" id="availability-date" class="mt-1 p-2 border rounded-md">
                             </div>
-                            <button id="generate-default-slots-btn" class="bg-purple-500 text-white py-2 px-4 rounded-md font-bold hover:bg-purple-600">Gerar Horários (09h-18h)</button>
+                            <button id="generate-default-slots-btn" class="bg-purple-500 text-white py-2 px-4 rounded-md font-bold hover:bg-purple-600 disabled:opacity-50">Gerar Horários (09h-18h)</button>
                             <button id="close-day-btn" class="bg-red-500 text-white py-2 px-4 rounded-md font-bold hover:bg-red-600">Fechar Dia Inteiro</button>
                         </div>
                         <div class="mt-4 pt-4 border-t">
                              <h4 class="text-md font-semibold mb-2">Adicionar Horário Específico</h4>
                              <div class="flex flex-wrap items-end gap-4">
                                  <div>
-                                    <label for="new-time-slot" class="block text-sm font-medium">Horário</label>
-                                    <input type="time" id="new-time-slot" class="mt-1 p-2 border rounded-md" step="3600">
-                                </div>
-                                <button id="add-slot-btn" class="bg-blue-500 text-white py-2 px-4 rounded-md font-bold hover:bg-blue-600">Adicionar Horário</button>
-                            </div>
+                                     <label for="new-time-slot" class="block text-sm font-medium">Horário</label>
+                                     <input type="time" id="new-time-slot" class="mt-1 p-2 border rounded-md" step="3600">
+                                 </div>
+                                 <button id="add-slot-btn" class="bg-blue-500 text-white py-2 px-4 rounded-md font-bold hover:bg-blue-600">Adicionar Horário</button>
+                             </div>
                         </div>
                         <div id="slots-for-date-container" class="mt-6">
-                            <!-- Slots para a data selecionada aparecerão aqui -->
-                        </div>
+                            </div>
                     </div>
 
                     <div class="bg-white p-6 rounded-xl shadow-lg">
@@ -203,15 +186,13 @@
                                     </tr>
                                 </thead>
                                 <tbody id="appointments-table-body" class="bg-white divide-y divide-gray-200">
-                                    <!-- Agendamentos serão injetados aqui -->
-                                </tbody>
+                                    </tbody>
                             </table>
                         </div>
                     </div>
-                </div>
+                </section>
 
-                <!-- Aba Caixa -->
-                <div id="caixa-tab-content" class="admin-tab-content hidden">
+                <section id="caixa-tab-content" class="admin-tab-content hidden">
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div id="caixa-dia-card" class="bg-white p-6 rounded-xl shadow-lg cursor-pointer hover:shadow-2xl transition-shadow">
                             <h4 class="text-lg font-bold text-gray-600">Caixa do Dia</h4>
@@ -229,14 +210,11 @@
                             <p id="caixa-mes-count" class="text-sm text-gray-500">0 serviços</p>
                         </div>
                     </div>
-                </div>
+                </section>
             </div>
-        </div>
+        </main>
     </div>
     
-    <!-- ========== MODAIS ========== -->
-
-    <!-- Modal de Agendamento - Passo 1 (Serviço, Data, Hora) -->
     <div id="schedule-modal-step1" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center p-4 z-50">
         <div class="bg-white w-full max-w-md p-8 rounded-2xl shadow-2xl">
             <h2 class="text-2xl font-bold mb-6 text-center text-pink-500">Faça o seu Agendamento</h2>
@@ -258,13 +236,12 @@
                 </select>
             </div>
             <div class="flex gap-4 mt-8">
-                <button id="close-modal1-btn" class="w-1/2 bg-gray-300 text-gray-800 py-3 rounded-lg hover:bg-gray-400 transition">Cancelar</button>
+                <button data-modal="schedule-modal-step1" class="close-modal-btn w-1/2 bg-gray-300 text-gray-800 py-3 rounded-lg hover:bg-gray-400 transition">Cancelar</button>
                 <button id="continue-to-step2-btn" class="w-1/2 bg-pink-500 text-white py-3 rounded-lg font-bold hover:bg-pink-600 transition">Continuar</button>
             </div>
         </div>
     </div>
 
-    <!-- Modal de Agendamento - Passo 2 (Confirmação) -->
     <div id="schedule-modal-step2" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center p-4 z-50">
         <div class="bg-white w-full max-w-md p-8 rounded-2xl shadow-2xl">
             <h2 class="text-2xl font-bold mb-2 text-center text-pink-500">Confirme o seu Agendamento</h2>
@@ -284,29 +261,37 @@
                 </div>
                  <div class="flex gap-4 mt-8">
                     <button type="button" id="back-to-step1-btn" class="w-1/2 bg-gray-300 text-gray-800 py-3 rounded-lg hover:bg-gray-400 transition">Voltar</button>
-                    <button type="submit" id="finalize-schedule-btn" class="w-1/2 bg-green-500 text-white py-3 rounded-lg font-bold hover:bg-green-600 transition">Finalizar Agendamento</button>
+                    <button type="submit" id="finalize-schedule-btn" class="w-1/2 bg-green-500 text-white py-3 rounded-lg font-bold hover:bg-green-600 transition disabled:opacity-50">Finalizar Agendamento</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Modal de Detalhes do Caixa -->
     <div id="caixa-details-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center p-4 z-50">
         <div class="bg-white w-full max-w-lg p-6 rounded-xl shadow-lg">
             <h3 id="caixa-modal-title" class="text-xl font-bold mb-4"></h3>
             <div id="caixa-modal-content" class="max-h-96 overflow-y-auto divide-y">
-                <!-- Conteúdo dinâmico -->
-            </div>
+                </div>
             <div class="text-right font-black text-xl mt-4" id="caixa-modal-total"></div>
-            <button id="close-caixa-modal-btn" class="mt-6 w-full bg-pink-500 text-white py-2 rounded-lg font-bold">Fechar</button>
+            <button data-modal="caixa-details-modal" class="close-modal-btn mt-6 w-full bg-pink-500 text-white py-2 rounded-lg font-bold">Fechar</button>
         </div>
     </div>
     
-    <!-- Script Principal da Aplicação -->
     <script type="module" id="app-logic">
     // =================================================================================
-    // INICIALIZAÇÃO E VARIÁVEIS GLOBAIS
+    // DOM ELEMENTS CACHE & GLOBAL VARIABLES
     // =================================================================================
+    const views = {
+        client: document.getElementById('client-view'),
+        adminLogin: document.getElementById('admin-login-view'),
+        adminPanel: document.getElementById('admin-panel-view'),
+    };
+
+    const modals = {
+        step1: document.getElementById('schedule-modal-step1'),
+        step2: document.getElementById('schedule-modal-step2'),
+        caixa: document.getElementById('caixa-details-modal'),
+    };
     
     let servicesCache = [];
     let currentAppointment = {
@@ -316,19 +301,32 @@
     };
     
     // =================================================================================
-    // FUNÇÕES UTILITÁRIAS
+    // UTILITY FUNCTIONS
     // =================================================================================
+    
     const showView = (viewId) => {
-        document.getElementById('client-view').classList.add('hidden');
-        document.getElementById('admin-login-view').classList.add('hidden');
-        document.getElementById('admin-panel-view').classList.add('hidden');
-        document.getElementById(viewId).classList.remove('hidden');
+        Object.values(views).forEach(view => view.classList.add('hidden'));
+        views[viewId].classList.remove('hidden');
+    };
+
+    const toggleModal = (modalId, show = true) => {
+        const modal = modals[modalId];
+        if (show) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        } else {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
     };
     
-    const showMessage = (elementId, message, isError = true) => {
+    const showMessage = (elementId, message, type = 'error') => {
         const el = document.getElementById(elementId);
         el.textContent = message;
-        el.className = `p-3 rounded-lg mb-4 text-sm ${isError ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-600'}`;
+        const colors = type === 'error' 
+            ? 'bg-red-100 text-red-600' 
+            : 'bg-green-100 text-green-600';
+        el.className = `p-3 rounded-lg mb-4 text-sm ${colors}`;
         el.classList.remove('hidden');
     };
     
@@ -337,67 +335,65 @@
     };
     
     const formatDate = (dateString) => {
-        const options = { day: '2-digit', month: 'short', year: 'numeric' };
-        // Adiciona T00:00:00 para evitar problemas de fuso horário na formatação
-        return new Date(dateString + 'T00:00:00').toLocaleDateString('pt-PT', options).replace(/\./g, '');
+        const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
+        return new Date(dateString + 'T00:00:00').toLocaleDateString('pt-BR', options);
     };
     
-    const formatTime = (timeString) => {
-        return timeString.substring(0, 5);
-    };
+    const formatTime = (timeString) => timeString.substring(0, 5);
     
-    const formatCurrency = (value) => {
-        return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value || 0);
+    const formatCurrency = (value) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value || 0);
+
+    const toggleButtonLoading = (btn, isLoading, originalText) => {
+        btn.disabled = isLoading;
+        if (isLoading) {
+            btn.textContent = 'Aguarde...';
+        } else {
+            btn.textContent = originalText;
+        }
     };
     
     // =================================================================================
-    // LÓGICA DA VISTA DO CLIENTE
+    // CLIENT VIEW & SCHEDULING LOGIC
     // =================================================================================
+    
     const clientViewLogic = () => {
-        const openModalBtn = document.getElementById('open-schedule-modal-btn');
-        const goToAdminBtn = document.getElementById('go-to-admin-login-btn');
-        const modal1 = document.getElementById('schedule-modal-step1');
-        const modal2 = document.getElementById('schedule-modal-step2');
         const serviceSelect = document.getElementById('service-select');
         const dateSelect = document.getElementById('date-select');
         const timeSelect = document.getElementById('time-select');
-    
-        dateSelect.min = new Date().toISOString().split('T')[0];
-        
-        openModalBtn.addEventListener('click', () => {
-            modal1.classList.remove('hidden');
-            modal1.classList.add('flex');
+
+        document.getElementById('open-schedule-modal-btn').addEventListener('click', () => {
+            toggleModal('step1');
             loadServicesForClient();
         });
-    
-        goToAdminBtn.addEventListener('click', () => showView('admin-login-view'));
-        
-        document.getElementById('close-modal1-btn').addEventListener('click', () => {
-            modal1.classList.add('hidden');
-            modal1.classList.remove('flex');
+
+        document.getElementById('go-to-admin-login-btn').addEventListener('click', () => showView('adminLogin'));
+
+        document.querySelectorAll('.close-modal-btn').forEach(btn => {
+            btn.addEventListener('click', () => toggleModal(btn.dataset.modal, false));
         });
-    
+
         document.getElementById('back-to-step1-btn').addEventListener('click', () => {
-            modal2.classList.add('hidden');
-            modal2.classList.remove('flex');
-            modal1.classList.remove('hidden');
-            modal1.classList.add('flex');
+            toggleModal('step2', false);
+            toggleModal('step1', true);
         });
-    
+        
+        dateSelect.min = new Date().toISOString().split('T')[0];
+        
         const loadServicesForClient = async () => {
-            const { data, error } = await window.supabase.from('services').select('*').order('name');
-            if (error) {
+            try {
+                const { data, error } = await window.supabase.from('services').select('*').order('name');
+                if (error) throw error;
+                servicesCache = data;
+                serviceSelect.innerHTML = '<option value="">Selecione um serviço</option>';
+                data.forEach(service => {
+                    serviceSelect.innerHTML += `<option value="${service.id}">${service.name} (${service.duration_minutes} min)</option>`;
+                });
+            } catch (error) {
                 console.error('Erro ao carregar serviços:', error);
                 serviceSelect.innerHTML = '<option>Erro ao carregar</option>';
-                return;
             }
-            servicesCache = data;
-            serviceSelect.innerHTML = '<option value="">Selecione um serviço</option>';
-            data.forEach(service => {
-                serviceSelect.innerHTML += `<option value="${service.id}">${service.name} (${service.duration_minutes} min)</option>`;
-            });
         };
-    
+        
         const loadAvailableTimes = async () => {
             const serviceId = serviceSelect.value;
             const selectedDate = dateSelect.value;
@@ -407,41 +403,39 @@
                 timeSelect.disabled = true;
                 return;
             }
-    
+            
             timeSelect.innerHTML = '<option>A verificar horários...</option>';
             timeSelect.disabled = true;
-    
+            
             const selectedService = servicesCache.find(s => s.id === serviceId);
             if (!selectedService) return;
-    
+            
             const slotsNeeded = Math.ceil(selectedService.duration_minutes / 60);
-    
+            
             try {
-                const { data: availableSlots, error: slotsError } = await window.supabase
+                const { data: availableSlots, error } = await window.supabase
                     .from('slots')
                     .select('time')
                     .eq('date', selectedDate)
                     .eq('status', 'available')
                     .order('time');
-    
-                if (slotsError) throw slotsError;
-    
+                if (error) throw error;
+                
                 if (!availableSlots || availableSlots.length === 0) {
                      timeSelect.innerHTML = '<option>Nenhum horário disponível</option>';
                      return;
                 }
-               
+                
                 const availableTimes = availableSlots.map(s => s.time);
                 const validStartTimes = [];
-    
+                
+                // Logic to find consecutive slots
                 for (let i = 0; i <= availableTimes.length - slotsNeeded; i++) {
                     let isSequenceValid = true;
                     for (let j = 1; j < slotsNeeded; j++) {
                         const currentTime = new Date(`${selectedDate}T${availableTimes[i+j-1]}`);
                         const nextTime = new Date(`${selectedDate}T${availableTimes[i+j]}`);
-                        const diffMinutes = (nextTime - currentTime) / (1000 * 60);
-    
-                        if (diffMinutes !== 60) {
+                        if ((nextTime - currentTime) / (1000 * 60) !== 60) {
                             isSequenceValid = false;
                             break;
                         }
@@ -458,226 +452,225 @@
                     });
                     timeSelect.disabled = false;
                 } else {
-                    timeSelect.innerHTML = '<option>Nenhum horário para a duração deste serviço.</option>';
+                    timeSelect.innerHTML = '<option>Não há horários para este serviço.</option>';
                 }
-    
             } catch (error) {
                 console.error('Erro ao carregar horários:', error);
                 timeSelect.innerHTML = '<option>Erro ao verificar horários</option>';
             }
         };
-    
+        
         serviceSelect.addEventListener('change', loadAvailableTimes);
         dateSelect.addEventListener('change', loadAvailableTimes);
-    
+        
         document.getElementById('continue-to-step2-btn').addEventListener('click', () => {
             hideMessage('step1-message');
             const serviceId = serviceSelect.value;
             const date = dateSelect.value;
             const time = timeSelect.value;
-    
+            
             if (!serviceId || !date || !time) {
                 showMessage('step1-message', 'Por favor, selecione serviço, data e horário.');
                 return;
             }
-    
+            
             const service = servicesCache.find(s => s.id === serviceId);
             currentAppointment = { service, date, time };
-    
+            
             document.getElementById('summary-service').textContent = service.name;
             document.getElementById('summary-datetime').textContent = `${formatDate(date)} às ${formatTime(time)}`;
             
-            modal1.classList.add('hidden');
-            modal1.classList.remove('flex');
-            modal2.classList.remove('hidden');
-            modal2.classList.add('flex');
+            toggleModal('step1', false);
+            toggleModal('step2', true);
         });
-    
+        
         document.getElementById('confirm-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             hideMessage('step2-message');
             const name = document.getElementById('client-name').value.trim();
             const phone = document.getElementById('client-phone').value.trim();
-    
+            
             if (!name || !phone) {
                 showMessage('step2-message', 'Nome e telefone são obrigatórios.');
                 return;
             }
-    
-            const { service, date, time } = currentAppointment;
-            const appointmentData = {
-                service_name: service.name,
-                appointment_date: date,
-                appointment_time: time,
-                client_name: name,
-                client_phone: phone,
-                status: 'Agendado',
-                service_id: service.id,
-                price: service.price,
-            };
-    
+            
             const btn = document.getElementById('finalize-schedule-btn');
-            btn.disabled = true;
-            btn.textContent = 'A agendar...';
+            toggleButtonLoading(btn, true, 'Finalizar Agendamento');
+            
+            const { service, date, time } = currentAppointment;
             
             try {
-                const { error: appointError } = await window.supabase.from('appointments').insert(appointmentData);
+                // Insert appointment
+                const { error: appointError } = await window.supabase.from('appointments').insert({
+                    service_name: service.name,
+                    appointment_date: date,
+                    appointment_time: time,
+                    client_name: name,
+                    client_phone: phone,
+                    status: 'Agendado',
+                    service_id: service.id,
+                    price: service.price,
+                });
                 if (appointError) throw appointError;
-    
+                
+                // Update slots status
                 const slotsNeeded = Math.ceil(service.duration_minutes / 60);
                 const startTime = new Date(`${date}T${time}`);
-                const slotsToUpdate = [];
-                for (let i = 0; i < slotsNeeded; i++) {
+                const slotsToUpdate = Array.from({ length: slotsNeeded }, (_, i) => {
                     const slotTime = new Date(startTime.getTime() + i * 60 * 60000);
-                    slotsToUpdate.push(slotTime.toTimeString().split(' ')[0]);
-                }
+                    return slotTime.toTimeString().split(' ')[0];
+                });
                 
-                await window.supabase
+                const { error: slotError } = await window.supabase
                     .from('slots')
                     .update({ status: 'occupied' })
                     .eq('date', date)
                     .in('time', slotsToUpdate);
-    
-                const formattedDate = formatDate(date);
-                const message = `Olá, sou ${name} e gostaria de confirmar o meu agendamento para o serviço de ${service.name} no dia ${formattedDate} às ${formatTime(time)}. O meu telefone é ${phone}. Obrigado!`;
-                // IMPORTANTE: Substitua SEU_NUMERO_AQUI pelo seu número de WhatsApp
+                if (slotError) throw slotError;
+                
+                // Redirect to WhatsApp
+                // IMPORTANTE: Substitua SEU_NUMERO_AQUI pelo seu número de WhatsApp com código do país (ex: 5521999999999)
+                const message = `Olá, sou ${name} e gostaria de confirmar o meu agendamento para o serviço de ${service.name} no dia ${formatDate(date)} às ${formatTime(time)}. O meu telefone é ${phone}. Obrigado!`;
                 const whatsappUrl = `https://api.whatsapp.com/send?phone=SEU_NUMERO_AQUI&text=${encodeURIComponent(message)}`;
                 
-                document.getElementById('confirm-form').reset();
-                modal2.classList.add('hidden');
-                modal2.classList.remove('flex');
-    
+                e.target.reset();
+                toggleModal('step2', false);
                 window.open(whatsappUrl, '_blank');
-    
+                
             } catch (error) {
                 console.error('Erro ao finalizar agendamento:', error);
-                showMessage('step2-message', 'Ocorreu um erro. Tente novamente ou contacte o suporte.');
+                showMessage('step2-message', `Ocorreu um erro: ${error.message}. Tente novamente.`);
             } finally {
-                btn.disabled = false;
-                btn.textContent = 'Finalizar Agendamento';
+                toggleButtonLoading(btn, false, 'Finalizar Agendamento');
             }
         });
     };
     
     // =================================================================================
-    // LÓGICA DO PAINEL ADMINISTRATIVO (COM CORREÇÕES)
+    // ADMIN PANEL LOGIC
     // =================================================================================
+    
     const adminPanelLogic = () => {
-        // --- Lógica de Login (CORRIGIDO) ---
-        document.getElementById('login-form').addEventListener('submit', async (e) => {
+        // --- Login & Logout ---
+        const loginForm = document.getElementById('login-form');
+        loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             hideMessage('login-error-message');
-            const user = document.getElementById('username').value;
-            const pass = document.getElementById('password').value;
-    
-            if (user === 'tata' && pass === 'tata0000') {
-                const { data, error } = await window.supabase.auth.signInWithPassword({
-                    email: 'tata@example.com', // E-mail fixo para o admin
-                    password: 'tata0000'
-                });
+            const email = document.getElementById('email-login').value;
+            const password = document.getElementById('password-login').value;
+            const btn = document.getElementById('login-submit-btn');
 
-                if (error) {
-                    showMessage('login-error-message', 'Falha na autenticação: ' + error.message + '. Verifique se o utilizador "tata@example.com" existe no Supabase Auth.');
-                    return;
-                }
-    
-                // Sucesso! O cliente Supabase agora está autenticado.
-                showView('admin-panel-view');
-                document.getElementById('login-form').reset();
+            toggleButtonLoading(btn, true, 'Entrar');
+
+            try {
+                // MELHORIA DE SEGURANÇA: A única validação é feita pelo Supabase.
+                const { data, error } = await window.supabase.auth.signInWithPassword({ email, password });
+                if (error) throw error;
+                
+                showView('adminPanel');
+                loginForm.reset();
                 loadAdminDashboard();
-            } else {
-                showMessage('login-error-message', 'Usuário ou senha locais inválidos.');
+            } catch (error) {
+                showMessage('login-error-message', 'Falha na autenticação: ' + error.message);
+            } finally {
+                toggleButtonLoading(btn, false, 'Entrar');
             }
         });
-    
-        document.getElementById('back-to-client-view-btn').addEventListener('click', () => showView('client-view'));
-    
-        // --- Lógica do Painel Principal ---
+
+        document.getElementById('back-to-client-view-btn').addEventListener('click', () => showView('client'));
+        
+        document.getElementById('logout-btn').addEventListener('click', async () => {
+            await window.supabase.auth.signOut();
+            showView('client');
+        });
+
+        // --- Dashboard & Tabs ---
         const loadAdminDashboard = () => {
             showTodaysAppointmentsAlert();
             switchTab('services');
         };
-    
-        // Logout (CORRIGIDO)
-        document.getElementById('logout-btn').addEventListener('click', async () => {
-            const { error } = await window.supabase.auth.signOut();
-            if (error) {
-                console.error('Erro ao fazer logout:', error);
-            }
-            showView('client-view');
-        });
-    
+
         const showTodaysAppointmentsAlert = async () => {
             const alertBox = document.getElementById('todays-appointments-alert');
             const listEl = document.getElementById('todays-appointments-list');
             const today = new Date().toISOString().split('T')[0];
-    
-            const { data, error } = await window.supabase
-                .from('appointments')
-                .select('*')
-                .eq('appointment_date', today)
-                .eq('status', 'Agendado')
-                .order('appointment_time');
-    
-            if (error || !data || data.length === 0) {
-                listEl.innerHTML = '<li>Nenhum cliente agendado para hoje!</li>';
-            } else {
-                listEl.innerHTML = data.map(app => 
-                    `<li><strong>${formatTime(app.appointment_time)}</strong> - ${app.service_name} (${app.client_name})</li>`
-                ).join('');
+            
+            try {
+                const { data, error } = await window.supabase
+                    .from('appointments')
+                    .select('service_name, appointment_time, client_name')
+                    .eq('appointment_date', today)
+                    .eq('status', 'Agendado')
+                    .order('appointment_time');
+                if (error) throw error;
+
+                if (!data || data.length === 0) {
+                    listEl.innerHTML = '<li>Nenhum cliente agendado para hoje!</li>';
+                } else {
+                    listEl.innerHTML = data.map(app => 
+                        `<li><strong>${formatTime(app.appointment_time)}</strong> - ${app.service_name} (${app.client_name})</li>`
+                    ).join('');
+                }
+                alertBox.classList.remove('hidden');
+            } catch (error) {
+                console.error("Erro ao buscar agendamentos do dia:", error);
+                listEl.innerHTML = '<li>Erro ao carregar agendamentos.</li>';
             }
-            alertBox.classList.remove('hidden');
         };
+
         document.getElementById('close-alert-btn').addEventListener('click', () => {
             document.getElementById('todays-appointments-alert').classList.add('hidden');
         });
-    
+
         const adminTabs = document.getElementById('admin-tabs');
         adminTabs.addEventListener('click', (e) => {
             if (e.target.matches('.admin-tab')) {
-                const tabName = e.target.dataset.tab;
-                switchTab(tabName);
+                switchTab(e.target.dataset.tab);
             }
         });
         
         const switchTab = (tabName) => {
             adminTabs.querySelectorAll('.admin-tab').forEach(tab => {
-                tab.classList.toggle('border-pink-500', tab.dataset.tab === tabName);
-                tab.classList.toggle('text-pink-600', tab.dataset.tab === tabName);
-                tab.classList.toggle('border-transparent', tab.dataset.tab !== tabName);
-                tab.classList.toggle('text-gray-500', tab.dataset.tab !== tabName);
+                const isActive = tab.dataset.tab === tabName;
+                tab.classList.toggle('border-pink-500', isActive);
+                tab.classList.toggle('text-pink-600', isActive);
+                tab.classList.toggle('border-transparent', !isActive);
+                tab.classList.toggle('text-gray-500', !isActive);
             });
             
-            document.querySelectorAll('.admin-tab-content').forEach(content => {
-                content.classList.add('hidden');
-            });
+            document.querySelectorAll('.admin-tab-content').forEach(content => content.classList.add('hidden'));
             document.getElementById(`${tabName}-tab-content`).classList.remove('hidden');
     
             if (tabName === 'services') loadServicesForAdmin();
             if (tabName === 'agenda') loadAdminAgenda();
             if (tabName === 'caixa') loadCaixa();
         };
-    
-        // --- Aba Serviços (CRUD) ---
+
+        // --- Services Tab (CRUD) ---
         const serviceForm = document.getElementById('service-form');
         const serviceTableBody = document.getElementById('services-table-body');
-    
+
         const loadServicesForAdmin = async () => {
-            const { data, error } = await window.supabase.from('services').select('*').order('name');
-            if (error) { console.error(error); return; }
-            servicesCache = data;
-            serviceTableBody.innerHTML = data.map(s => `
-                <tr>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${s.id.substring(0, 8)}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${s.name}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${s.duration_minutes} min</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formatCurrency(s.price)}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                        <button data-id="${s.id}" class="edit-service-btn text-indigo-600 hover:text-indigo-900">Editar</button>
-                        <button data-id="${s.id}" class="delete-service-btn text-red-600 hover:text-red-900">Excluir</button>
-                    </td>
-                </tr>
-            `).join('');
+            try {
+                const { data, error } = await window.supabase.from('services').select('*').order('name');
+                if (error) throw error;
+                servicesCache = data;
+                serviceTableBody.innerHTML = data.map(s => `
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${s.name}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${s.duration_minutes} min</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formatCurrency(s.price)}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+                            <button data-id="${s.id}" class="edit-service-btn text-indigo-600 hover:text-indigo-900">Editar</button>
+                            <button data-id="${s.id}" class="delete-service-btn text-red-600 hover:text-red-900">Excluir</button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                 console.error(error);
+                 serviceTableBody.innerHTML = `<tr><td colspan="4" class="text-center p-4 text-red-500">Erro ao carregar serviços.</td></tr>`;
+            }
         };
     
         serviceForm.addEventListener('submit', async (e) => {
@@ -688,14 +681,18 @@
                 price: parseFloat(document.getElementById('service-price').value),
             };
             const id = document.getElementById('service-id').value;
-            const { error } = id 
-                ? await window.supabase.from('services').update(serviceData).eq('id', id)
-                : await window.supabase.from('services').insert(serviceData);
-    
-            if (error) alert('Erro ao salvar serviço: ' + error.message);
-            else {
+            
+            const promise = id 
+                ? window.supabase.from('services').update(serviceData).eq('id', id)
+                : window.supabase.from('services').insert(serviceData);
+
+            try {
+                const { error } = await promise;
+                if (error) throw error;
                 resetServiceForm();
                 loadServicesForAdmin();
+            } catch (error) {
+                alert('Erro ao salvar serviço: ' + error.message);
             }
         });
     
@@ -714,56 +711,64 @@
             }
             if (e.target.classList.contains('delete-service-btn')) {
                 if (confirm('Tem a certeza que deseja excluir este serviço?')) {
-                    const { error } = await window.supabase.from('services').delete().eq('id', id);
-                    if (error) alert('Erro ao excluir: ' + error.message);
-                    else loadServicesForAdmin();
+                    try {
+                        const { error } = await window.supabase.from('services').delete().eq('id', id);
+                        if (error) throw error;
+                        loadServicesForAdmin();
+                    } catch (error) {
+                        alert('Erro ao excluir: ' + error.message);
+                    }
                 }
             }
         });
-    
+
         document.getElementById('cancel-edit-btn').addEventListener('click', resetServiceForm);
-    
+        
         function resetServiceForm() {
             document.getElementById('service-form-title').textContent = 'Adicionar Novo Serviço';
             serviceForm.reset();
             document.getElementById('service-id').value = '';
             document.getElementById('cancel-edit-btn').classList.add('hidden');
         }
-    
-        // --- Aba Agenda ---
+
+        // --- Agenda Tab ---
         const appointmentsTableBody = document.getElementById('appointments-table-body');
         const availabilityDateInput = document.getElementById('availability-date');
         
         const loadAdminAgenda = async () => {
-            const { data, error } = await window.supabase.from('appointments').select('*, services(id, name)').order('appointment_date', { ascending: false }).order('appointment_time');
-            if (error) { console.error(error); return; }
-            
-            appointmentsTableBody.innerHTML = data.map(app => {
-                let statusClass = 'bg-blue-100 text-blue-800';
-                if (app.status === 'Concluído') statusClass = 'bg-green-100 text-green-800';
-                if (app.status === 'Cancelado') statusClass = 'bg-red-100 text-red-800';
+            try {
+                const { data, error } = await window.supabase.from('appointments').select('*').order('appointment_date', { ascending: false }).order('appointment_time');
+                if (error) throw error;
                 
-                return `
-                    <tr>
-                        <td class="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${app.service_name}</td>
-                        <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">${formatDate(app.appointment_date)} ${formatTime(app.appointment_time)}</td>
-                        <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">${app.client_name}</td>
-                        <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">${app.client_phone}</td>
-                        <td class="px-4 py-4 whitespace-nowrap text-sm"><span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusClass}">${app.status}</span></td>
-                        <td class="px-4 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                            ${app.status === 'Agendado' ? `
-                                <button data-id="${app.id}" class="conclude-appointment-btn text-green-600 hover:text-green-900">Concluir</button>
-                                <button data-id="${app.id}" class="cancel-appointment-btn text-red-600 hover:text-red-900">Cancelar</button>
-                            ` : ''}
-                        </td>
-                    </tr>
-                `;
-            }).join('');
-    
-            availabilityDateInput.value = new Date().toISOString().split('T')[0];
+                appointmentsTableBody.innerHTML = data.map(app => {
+                    let statusClass = 'bg-blue-100 text-blue-800';
+                    if (app.status === 'Concluído') statusClass = 'bg-green-100 text-green-800';
+                    if (app.status === 'Cancelado') statusClass = 'bg-red-100 text-red-800';
+                    
+                    return `
+                        <tr>
+                            <td class="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${app.service_name}</td>
+                            <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">${formatDate(app.appointment_date)} ${formatTime(app.appointment_time)}</td>
+                            <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">${app.client_name}</td>
+                            <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">${app.client_phone}</td>
+                            <td class="px-4 py-4 whitespace-nowrap text-sm"><span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusClass}">${app.status}</span></td>
+                            <td class="px-4 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+                                ${app.status === 'Agendado' ? `
+                                    <button data-id="${app.id}" class="conclude-appointment-btn text-green-600 hover:text-green-900">Concluir</button>
+                                    <button data-id="${app.id}" class="cancel-appointment-btn text-red-600 hover:text-red-900">Cancelar</button>
+                                ` : ''}
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            } catch (error) {
+                console.error(error);
+                appointmentsTableBody.innerHTML = `<tr><td colspan="6" class="text-center p-4 text-red-500">Erro ao carregar agendamentos.</td></tr>`;
+            }
+            availabilityDateInput.valueAsDate = new Date();
             loadSlotsForDate();
         };
-    
+
         appointmentsTableBody.addEventListener('click', async (e) => {
             const id = e.target.dataset.id;
             let newStatus = '';
@@ -771,92 +776,100 @@
             if (e.target.classList.contains('cancel-appointment-btn')) newStatus = 'Cancelado';
             
             if (id && newStatus) {
-                const { error } = await window.supabase.from('appointments').update({ status: newStatus }).eq('id', id);
-                if (error) alert('Erro ao atualizar status: ' + error.message);
-                else {
+                try {
+                    const { error } = await window.supabase.from('appointments').update({ status: newStatus }).eq('id', id);
+                    if (error) throw error;
                     if (newStatus === 'Cancelado') await freeUpSlotsForAppointment(id);
                     loadAdminAgenda();
+                } catch (error) {
+                    alert('Erro ao atualizar status: ' + error.message);
                 }
             }
         });
-    
-        // CORRIGIDO: Função para liberar slots
+        
         async function freeUpSlotsForAppointment(appointmentId) {
-            const { data: appData, error } = await window.supabase
-                .from('appointments')
-                .select('appointment_date, appointment_time, services(duration_minutes)')
-                .eq('id', appointmentId)
-                .single();
-    
-            if (error || !appData || !appData.services) {
-                console.error("Erro ao buscar dados para liberar slots:", error);
-                return;
+            try {
+                const { data: appData, error } = await window.supabase
+                    .from('appointments')
+                    .select('appointment_date, appointment_time, services(duration_minutes)')
+                    .eq('id', appointmentId)
+                    .single();
+        
+                if (error || !appData || !appData.services) throw error || new Error("Dados da consulta ou serviço não encontrados.");
+        
+                const slotsNeeded = Math.ceil(appData.services.duration_minutes / 60);
+                const startTime = new Date(`${appData.appointment_date}T${appData.appointment_time}`);
+                const slotsToFree = Array.from({ length: slotsNeeded }, (_, i) => {
+                    const slotTime = new Date(startTime.getTime() + i * 60 * 60000);
+                    return slotTime.toTimeString().split(' ')[0];
+                });
+                
+                const { error: updateError } = await window.supabase
+                    .from('slots')
+                    .update({ status: 'available' })
+                    .eq('date', appData.appointment_date)
+                    .in('time', slotsToFree);
+                if (updateError) throw updateError;
+            } catch(error) {
+                 console.error("Erro ao reabrir slots:", error);
+                 alert("A consulta foi cancelada, mas ocorreu um erro ao reabrir os horários na agenda.");
             }
-    
-            const duration = appData.services.duration_minutes;
-            const slotsNeeded = Math.ceil(duration / 60);
-            const startTime = new Date(`${appData.appointment_date}T${appData.appointment_time}`);
-            const slotsToFree = [];
-            for (let i = 0; i < slotsNeeded; i++) {
-                const slotTime = new Date(startTime.getTime() + i * 60 * 60000);
-                slotsToFree.push(slotTime.toTimeString().split(' ')[0]);
-            }
-            
-            const { error: updateError } = await window.supabase
-                .from('slots')
-                .update({ status: 'available' })
-                .eq('date', appData.appointment_date)
-                .in('time', slotsToFree);
-
-            if(updateError) console.error("Erro ao reabrir slots:", updateError);
         }
         
         availabilityDateInput.addEventListener('change', loadSlotsForDate);
-    
+        
         async function loadSlotsForDate() {
             const date = availabilityDateInput.value;
             const container = document.getElementById('slots-for-date-container');
             if (!date) { container.innerHTML = ''; return; }
-    
-            const { data, error } = await window.supabase.from('slots').select('*').eq('date', date).order('time');
-            if (error) { console.error(error); return; }
-    
-            if (data.length === 0) {
-                container.innerHTML = `<p class="text-gray-500 mt-4">Nenhum horário definido para ${formatDate(date)}.</p>`;
-            } else {
-                container.innerHTML = `
-                    <h4 class="font-bold mb-2 mt-4">Horários para ${formatDate(date)}</h4>
-                    <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2">
-                        ${data.map(slot => `
-                            <div class="p-2 rounded-md flex justify-between items-center text-center ${slot.status === 'available' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
-                                <span class="text-sm font-mono font-semibold">${formatTime(slot.time)}</span>
-                                <button data-date="${slot.date}" data-time="${slot.time}" class="remove-slot-btn text-red-700 font-bold hover:text-red-500">&times;</button>
-                            </div>
-                        `).join('')}
-                    </div>
-                `;
+            
+            try {
+                const { data, error } = await window.supabase.from('slots').select('*').eq('date', date).order('time');
+                if (error) throw error;
+        
+                if (data.length === 0) {
+                    container.innerHTML = `<p class="text-gray-500 mt-4">Nenhum horário definido para ${formatDate(date)}.</p>`;
+                } else {
+                    container.innerHTML = `
+                        <h4 class="font-bold mb-2 mt-4">Horários para ${formatDate(date)}</h4>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2">
+                            ${data.map(slot => `
+                                <div class="p-2 rounded-md flex justify-between items-center text-center ${slot.status === 'available' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                                    <span class="text-sm font-mono font-semibold">${formatTime(slot.time)}</span>
+                                    <button data-date="${slot.date}" data-time="${slot.time}" class="remove-slot-btn text-red-700 font-bold hover:text-red-500">&times;</button>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                }
+            } catch(error) {
+                console.error(error);
+                container.innerHTML = `<p class="text-red-500 mt-4">Erro ao carregar horários.</p>`;
             }
         }
         
-        document.getElementById('generate-default-slots-btn').addEventListener('click', async () => {
+        document.getElementById('generate-default-slots-btn').addEventListener('click', async (e) => {
             const date = availabilityDateInput.value;
             if (!date) { alert('Por favor, selecione uma data primeiro.'); return; }
             if (!confirm(`Deseja gerar horários padrão (09:00 - 18:00) para o dia ${formatDate(date)}?\nIsto não irá sobrepor horários já existentes.`)) return;
+            
+            const btn = e.target;
+            toggleButtonLoading(btn, true, 'Gerar Horários (09h-18h)');
+            
+            const slotsToInsert = Array.from({length: 10}, (_, i) => ({
+                date: date,
+                time: `${(i + 9).toString().padStart(2, '0')}:00:00`,
+                status: 'available'
+            }));
 
-            const slotsToInsert = [];
-            for(let hour = 9; hour <= 18; hour++) {
-                slotsToInsert.push({
-                    date: date,
-                    time: `${hour.toString().padStart(2, '0')}:00:00`,
-                    status: 'available'
-                });
-            }
-
-            const { error } = await window.supabase.from('slots').upsert(slotsToInsert);
-            if(error) alert('Erro ao gerar horários: ' + error.message);
-            else {
-                alert('Horários padrão gerados com sucesso!');
+            try {
+                const { error } = await window.supabase.from('slots').upsert(slotsToInsert, { onConflict: 'date,time' });
+                if (error) throw error;
                 loadSlotsForDate();
+            } catch(error) {
+                alert('Erro ao gerar horários: ' + error.message);
+            } finally {
+                toggleButtonLoading(btn, false, 'Gerar Horários (09h-18h)');
             }
         });
 
@@ -864,61 +877,75 @@
             const date = availabilityDateInput.value;
             const time = document.getElementById('new-time-slot').value;
             if (!date || !time) { alert('Selecione data e hora.'); return; }
-            const { error } = await window.supabase.from('slots').insert({ date, time, status: 'available' });
-            if(error) alert('Erro ao adicionar horário. Talvez já exista. ' + error.message);
-            else loadSlotsForDate();
+
+            try {
+                const { error } = await window.supabase.from('slots').insert({ date, time: `${time}:00`, status: 'available' });
+                if (error) throw error;
+                loadSlotsForDate();
+            } catch(error) {
+                 alert('Erro ao adicionar horário. Talvez já exista. ' + error.message);
+            }
         });
-    
+        
         document.getElementById('close-day-btn').addEventListener('click', async () => {
             const date = availabilityDateInput.value;
             if (!date || !confirm(`Tem a certeza que quer apagar TODOS os horários do dia ${formatDate(date)}?`)) return;
             
-            const { error } = await window.supabase.from('slots').delete().eq('date', date);
-            if(error) alert('Erro ao fechar o dia: ' + error.message);
-            else loadSlotsForDate();
+            try {
+                const { error } = await window.supabase.from('slots').delete().eq('date', date);
+                if (error) throw error;
+                loadSlotsForDate();
+            } catch(error) {
+                alert('Erro ao fechar o dia: ' + error.message);
+            }
         });
-    
+        
         document.getElementById('slots-for-date-container').addEventListener('click', async (e) => {
             if(e.target.classList.contains('remove-slot-btn')) {
                 const date = e.target.dataset.date;
                 const time = e.target.dataset.time;
                 if (confirm(`Remover o horário das ${formatTime(time)} do dia ${formatDate(date)}?`)) {
-                    const { error } = await window.supabase.from('slots').delete().match({ date, time });
-                    if (error) alert('Erro ao remover: ' + error.message);
-                    else loadSlotsForDate();
+                    try {
+                        const { error } = await window.supabase.from('slots').delete().match({ date, time });
+                        if (error) throw error;
+                        loadSlotsForDate();
+                    } catch(error) {
+                        alert('Erro ao remover: ' + error.message);
+                    }
                 }
             }
         });
-    
-        // --- Aba Caixa (CORRIGIDO) ---
+
+        // --- Caixa Tab ---
         const loadCaixa = async () => {
-            const { data: completed, error } = await window.supabase
-                .from('appointments')
-                .select('price, appointment_date, service_name, client_name')
-                .eq('status', 'Concluído');
-            
-            if(error) { console.error("Erro ao carregar caixa:", error); return; }
-    
-            const now = new Date();
-            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString().split('T')[0];
-    
-            const weekStart = new Date(now);
-            const dayOfWeek = weekStart.getDay();
-            const diff = weekStart.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
-            weekStart.setDate(diff);
-            const startOfWeek = new Date(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate()).toISOString().split('T')[0];
-    
-            const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
-    
-            const dayData = completed.filter(a => a.appointment_date === today);
-            const weekData = completed.filter(a => a.appointment_date >= startOfWeek);
-            const monthData = completed.filter(a => a.appointment_date >= startOfMonth);
-    
-            updateCaixaCard('dia', dayData);
-            updateCaixaCard('semana', weekData);
-            updateCaixaCard('mes', monthData);
+            try {
+                const { data: completed, error } = await window.supabase
+                    .from('appointments')
+                    .select('price, appointment_date, service_name, client_name')
+                    .eq('status', 'Concluído');
+                if(error) throw error;
+        
+                const now = new Date();
+                const todayStr = now.toISOString().split('T')[0];
+                
+                const startOfWeek = new Date(now);
+                startOfWeek.setDate(now.getDate() - now.getDay() + (now.getDay() === 0 ? -6 : 1));
+                const startOfWeekStr = startOfWeek.toISOString().split('T')[0];
+                
+                const startOfMonthStr = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+
+                const dayData = completed.filter(a => a.appointment_date === todayStr);
+                const weekData = completed.filter(a => a.appointment_date >= startOfWeekStr);
+                const monthData = completed.filter(a => a.appointment_date >= startOfMonthStr);
+        
+                updateCaixaCard('dia', dayData);
+                updateCaixaCard('semana', weekData);
+                updateCaixaCard('mes', monthData);
+            } catch(error) {
+                console.error("Erro ao carregar caixa:", error);
+            }
         };
-    
+        
         const updateCaixaCard = (period, data) => {
             const total = data.reduce((sum, item) => sum + (item.price || 0), 0);
             const count = data.length;
@@ -928,46 +955,39 @@
         };
         
         const showCaixaDetails = (period, data) => {
-            const modal = document.getElementById('caixa-details-modal');
             const titleEl = document.getElementById('caixa-modal-title');
             const contentEl = document.getElementById('caixa-modal-content');
             const totalEl = document.getElementById('caixa-modal-total');
-    
+        
             const periodName = { dia: 'do Dia', semana: 'da Semana', mes: 'do Mês' };
             titleEl.textContent = `Serviços Concluídos (${periodName[period]})`;
-    
+        
             contentEl.innerHTML = data.length === 0 
                 ? `<p class="p-4 text-center text-gray-500">Nenhum serviço concluído neste período.</p>`
-                : data.map(item => `
+                : data.sort((a,b) => new Date(b.appointment_date) - new Date(a.appointment_date)).map(item => `
                     <div class="p-3 flex justify-between items-center">
                         <div>
                             <p class="font-semibold">${item.service_name}</p>
-                            <p class="text-sm text-gray-600">Cliente: ${item.client_name}</p>
+                            <p class="text-sm text-gray-600">Cliente: ${item.client_name} - ${formatDate(item.appointment_date)}</p>
                         </div>
                         <div class="font-bold text-green-600">${formatCurrency(item.price || 0)}</div>
                     </div>
                 `).join('');
-    
+        
             const total = data.reduce((sum, item) => sum + (item.price || 0), 0);
             totalEl.textContent = `Total: ${formatCurrency(total)}`;
-    
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-        };
         
-        document.getElementById('close-caixa-modal-btn').addEventListener('click', () => {
-            document.getElementById('caixa-details-modal').classList.add('hidden');
-            document.getElementById('caixa-details-modal').classList.remove('flex');
-        });
+            toggleModal('caixa', true);
+        };
     };
     
     // =================================================================================
-    // PONTO DE ENTRADA DA APLICAÇÃO
+    // APPLICATION ENTRY POINT
     // =================================================================================
     document.addEventListener('DOMContentLoaded', () => {
         clientViewLogic();
         adminPanelLogic();
-        showView('client-view');
+        showView('client');
     });
     </script>
 
