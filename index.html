@@ -193,26 +193,33 @@
 
             <div class="border-b border-gray-700">
                 <nav id="admin-tabs" class="-mb-px flex space-x-8" aria-label="Tabs">
-                    <button data-tab="agenda" class="admin-tab whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">Agenda</button>
+                    <button data-tab="agendamentos" class="admin-tab whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">Agendamentos</button>
+                    <button data-tab="disponibilidade" class="admin-tab whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">Disponibilidade</button>
                     <button data-tab="services" class="admin-tab whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">Serviços</button>
                     <button data-tab="caixa" class="admin-tab whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">Caixa</button>
                 </nav>
             </div>
 
             <div class="mt-8">
-                 <section id="agenda-tab-content" class="admin-tab-content hidden">
-                    <!-- New Calendar-based Availability Management -->
+                 <section id="agendamentos-tab-content" class="admin-tab-content hidden">
+                    <div class="bg-[#1f2937] border border-gray-700 p-6 rounded-xl shadow-lg">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl font-bold text-gray-200">Todos os Agendamentos</h3>
+                            <button id="clean-cancelled-btn" class="bg-yellow-800 text-yellow-200 text-xs py-1 px-3 rounded-full hover:bg-yellow-700 transition">
+                                Limpar Cancelados
+                            </button>
+                        </div>
+                        <div id="appointments-list-container" class="space-y-6">
+                            <!-- Appointment cards will be rendered here by JS -->
+                        </div>
+                    </div>
+                 </section>
+
+                 <section id="disponibilidade-tab-content" class="admin-tab-content hidden">
                     <div class="bg-[#1f2937] border border-gray-700 p-6 rounded-xl shadow-lg mb-8">
                         <h3 class="text-xl font-bold mb-4 text-gray-200">Gerir Disponibilidade</h3>
                         <div id="calendar-container">
                             <!-- Calendar will be rendered here by JS -->
-                        </div>
-                    </div>
-
-                    <div class="bg-[#1f2937] border border-gray-700 p-6 rounded-xl shadow-lg">
-                        <h3 class="text-xl font-bold mb-4 text-gray-200">Todos os Agendamentos</h3>
-                        <div id="appointments-list-container" class="space-y-6">
-                            <!-- Appointment cards will be rendered here by JS -->
                         </div>
                     </div>
                 </section>
@@ -609,7 +616,7 @@
                 
                 const { error: slotError } = await window.supabase
                     .from('slots')
-                    .update({ status: 'occupied', appointment_id: appointment.id })
+                    .update({ status: 'occupied' })
                     .eq('date', date)
                     .in('time', slotsToUpdate);
                 if (slotError) throw slotError;
@@ -690,7 +697,7 @@
         // --- Dashboard & Tabs ---
         const loadAdminDashboard = () => {
             showTodaysAppointmentsAlert();
-            switchTab('agenda');
+            switchTab('agendamentos');
         };
 
         const showTodaysAppointmentsAlert = async () => {
@@ -747,10 +754,8 @@
             document.getElementById(`${tabName}-tab-content`).classList.remove('hidden');
     
             if (tabName === 'services') loadServicesForAdmin();
-            if (tabName === 'agenda') {
-                loadAdminAgenda();
-                renderCalendar();
-            }
+            if (tabName === 'disponibilidade') renderCalendar();
+            if (tabName === 'agendamentos') loadAdminAgenda();
             if (tabName === 'caixa') loadCaixa();
         };
 
@@ -799,7 +804,7 @@
                 resetServiceForm();
                 loadServicesForAdmin();
             } catch (error) {
-                alert('Erro ao salvar serviço: ' + error.message);
+                console.error('Erro ao salvar serviço: ' + error.message);
             }
         });
     
@@ -817,14 +822,12 @@
                 }
             }
             if (e.target.classList.contains('delete-service-btn')) {
-                if (confirm('Tem a certeza que deseja excluir este serviço?')) {
-                    try {
-                        const { error } = await window.supabase.from('services').delete().eq('id', id);
-                        if (error) throw error;
-                        loadServicesForAdmin();
-                    } catch (error) {
-                        alert('Erro ao excluir: ' + error.message);
-                    }
+                try {
+                    const { error } = await window.supabase.from('services').delete().eq('id', id);
+                    if (error) throw error;
+                    loadServicesForAdmin();
+                } catch (error) {
+                    console.error('Erro ao excluir: ' + error.message);
                 }
             }
         });
@@ -838,7 +841,7 @@
             document.getElementById('cancel-edit-btn').classList.add('hidden');
         }
 
-        // --- Agenda Tab ---
+        // --- Appointments Tab ---
         const appointmentsListContainer = document.getElementById('appointments-list-container');
         
         const loadAdminAgenda = async () => {
@@ -934,15 +937,13 @@
             if (button.classList.contains('cancel-appointment-btn')) newStatus = 'Cancelado';
             
             if (id && newStatus) {
-                if(newStatus === 'Cancelado' && !confirm('Tem a certeza que deseja cancelar este agendamento? Os horários serão reabertos.')) return;
-                
                 try {
                     const { error } = await window.supabase.from('appointments').update({ status: newStatus }).eq('id', id);
                     if (error) throw error;
                     if (newStatus === 'Cancelado') await freeUpSlotsForAppointment(id);
                     loadAdminAgenda();
                 } catch (error) {
-                    alert('Erro ao atualizar status: ' + error.message);
+                    console.error('Erro ao atualizar status: ' + error.message);
                 }
             }
         });
@@ -966,17 +967,30 @@
                 
                 const { error: updateError } = await window.supabase
                     .from('slots')
-                    .update({ status: 'available', appointment_id: null })
+                    .update({ status: 'available' })
                     .eq('date', appData.appointment_date)
                     .in('time', slotsToFree);
                 if (updateError) throw updateError;
             } catch(error) {
                  console.error("Erro ao reabrir slots:", error);
-                 alert("A consulta foi cancelada, mas ocorreu um erro ao reabrir os horários na agenda.");
+                 console.error("A consulta foi cancelada, mas ocorreu um erro ao reabrir os horários na agenda.");
             }
         }
+
+        document.getElementById('clean-cancelled-btn').addEventListener('click', async () => {
+             const { error } = await window.supabase
+                .from('appointments')
+                .delete()
+                .eq('status', 'Cancelado');
+
+            if(error){
+                console.error("Erro ao limpar cancelados:", error.message);
+            } else {
+                loadAdminAgenda();
+            }
+        });
         
-        // --- NEW CALENDAR LOGIC ---
+        // --- Availability Tab (Calendar Logic) ---
         const calendarContainer = document.getElementById('calendar-container');
 
         const renderCalendar = async () => {
@@ -1056,7 +1070,7 @@
                 .eq('status', 'available');
 
             if (error) {
-                alert('Erro ao carregar horários do dia.');
+                console.error('Erro ao carregar horários do dia.');
                 return;
             }
 
@@ -1114,7 +1128,7 @@
                 .eq('status', 'available');
 
             if (deleteError) {
-                alert('Erro ao atualizar horários: ' + deleteError.message);
+                console.error('Erro ao atualizar horários: ' + deleteError.message);
                 return;
             }
 
@@ -1124,7 +1138,7 @@
                     .insert(slotsToInsert);
                 
                 if(insertError) {
-                    alert('Erro ao salvar novos horários: ' + insertError.message);
+                    console.error('Erro ao salvar novos horários: ' + insertError.message);
                     return;
                 }
             }
