@@ -64,6 +64,17 @@
             border-radius: 10px;
             border: 2px solid var(--bg-light);
         }
+        /* Calendar-specific styles */
+        .calendar-day.other-month {
+            opacity: 0.3;
+        }
+        .calendar-day {
+            transition: all 0.2s ease-in-out;
+        }
+        .calendar-day:hover {
+            transform: scale(1.05);
+            border-color: var(--pink-main);
+        }
     </style>
 </head>
 <body class="bg-[#111827] text-gray-200">
@@ -147,34 +158,18 @@
 
             <div class="mt-8">
                  <section id="agenda-tab-content" class="admin-tab-content hidden">
+                    <!-- New Calendar-based Availability Management -->
                     <div class="bg-[#1f2937] border border-gray-700 p-6 rounded-xl shadow-lg mb-8">
                         <h3 class="text-xl font-bold mb-4 text-gray-200">Gerir Disponibilidade</h3>
-                        <div class="flex flex-wrap items-end gap-4">
-                            <div>
-                                <label for="availability-date" class="block text-sm font-medium text-gray-400">Selecionar Data</label>
-                                <input type="date" id="availability-date" class="mt-1 p-2 bg-gray-700 border border-gray-600 rounded-md">
-                            </div>
-                            <button id="generate-default-slots-btn" class="bg-purple-600 text-white py-2 px-4 rounded-md font-bold hover:bg-purple-500 disabled:opacity-50 transition">Gerar Horários (09h-18h)</button>
-                            <button id="close-day-btn" class="bg-red-800 text-white py-2 px-4 rounded-md font-bold hover:bg-red-700 transition">Fechar Dia Inteiro</button>
-                        </div>
-                        <div class="mt-4 pt-4 border-t border-gray-700">
-                             <h4 class="text-md font-semibold mb-2 text-gray-300">Adicionar Horário Específico</h4>
-                             <div class="flex flex-wrap items-end gap-4">
-                                 <div>
-                                     <label for="new-time-slot" class="block text-sm font-medium text-gray-400">Horário</label>
-                                     <input type="time" id="new-time-slot" class="mt-1 p-2 bg-gray-700 border border-gray-600 rounded-md" step="3600">
-                                 </div>
-                                 <button id="add-slot-btn" class="bg-blue-600 text-white py-2 px-4 rounded-md font-bold hover:bg-blue-500 transition">Adicionar Horário</button>
-                             </div>
-                        </div>
-                        <div id="slots-for-date-container" class="mt-6">
+                        <div id="calendar-container">
+                            <!-- Calendar will be rendered here by JS -->
                         </div>
                     </div>
 
                     <div class="bg-[#1f2937] border border-gray-700 p-6 rounded-xl shadow-lg">
                         <h3 class="text-xl font-bold mb-4 text-gray-200">Todos os Agendamentos</h3>
                         <div id="appointments-list-container" class="space-y-6">
-                            <!-- Conteúdo dos cartões de agendamento será gerado via JS -->
+                            <!-- Appointment cards will be rendered here by JS -->
                         </div>
                     </div>
                 </section>
@@ -244,6 +239,7 @@
         </main>
     </div>
     
+    <!-- Client Modals -->
     <div id="schedule-modal-step1" class="fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
         <div class="bg-[#1f2937] w-full max-w-md p-8 rounded-2xl shadow-2xl border border-gray-700">
             <h2 class="text-2xl font-bold mb-6 text-center text-pink-400 gold-shadow">Faça o seu Agendamento</h2>
@@ -296,6 +292,7 @@
         </div>
     </div>
 
+    <!-- Admin Modals -->
     <div id="caixa-details-modal" class="fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
         <div class="bg-[#1f2937] w-full max-w-lg p-6 rounded-xl shadow-lg border border-gray-700">
             <h3 id="caixa-modal-title" class="text-xl font-bold mb-4 text-pink-400"></h3>
@@ -305,6 +302,20 @@
             <button data-modal="caixa" class="close-modal-btn mt-6 w-full bg-pink-500 text-white py-2 rounded-lg font-bold">Fechar</button>
         </div>
     </div>
+
+    <div id="hourly-management-modal" class="fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+        <div class="bg-[#1f2937] w-full max-w-md p-8 rounded-2xl shadow-2xl border border-gray-700">
+            <h2 id="hourly-modal-title" class="text-2xl font-bold mb-6 text-center text-pink-400 gold-shadow">Gerir Horários</h2>
+            <div id="hourly-modal-grid" class="max-h-64 overflow-y-auto grid grid-cols-4 gap-2 pr-2">
+                <!-- Hour slots will be rendered here by JS -->
+            </div>
+            <div class="flex gap-4 mt-8">
+                <button id="close-hourly-modal-btn" class="w-1/2 bg-gray-600 text-gray-200 py-3 rounded-lg hover:bg-gray-500 transition">Cancelar</button>
+                <button id="save-hourly-changes-btn" class="w-1/2 bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-500 transition">Salvar Alterações</button>
+            </div>
+        </div>
+    </div>
+
     
     <script type="module" id="app-logic">
     // =================================================================================
@@ -320,6 +331,7 @@
         step1: document.getElementById('schedule-modal-step1'),
         step2: document.getElementById('schedule-modal-step2'),
         caixa: document.getElementById('caixa-details-modal'),
+        hourly: document.getElementById('hourly-management-modal'),
     };
     
     let servicesCache = [];
@@ -328,6 +340,7 @@
         date: null,
         time: null
     };
+    let currentDate = new Date();
     
     // =================================================================================
     // UTILITY FUNCTIONS
@@ -671,7 +684,10 @@
             document.getElementById(`${tabName}-tab-content`).classList.remove('hidden');
     
             if (tabName === 'services') loadServicesForAdmin();
-            if (tabName === 'agenda') loadAdminAgenda();
+            if (tabName === 'agenda') {
+                loadAdminAgenda();
+                renderCalendar();
+            }
             if (tabName === 'caixa') loadCaixa();
         };
 
@@ -759,9 +775,8 @@
             document.getElementById('cancel-edit-btn').classList.add('hidden');
         }
 
-        // --- Agenda Tab (Redesigned Card View) ---
+        // --- Agenda Tab ---
         const appointmentsListContainer = document.getElementById('appointments-list-container');
-        const availabilityDateInput = document.getElementById('availability-date');
         
         const loadAdminAgenda = async () => {
             try {
@@ -835,7 +850,7 @@
                             `;
                         });
 
-                        html += `</div></div>`; // Close grid and date-group
+                        html += `</div></div>`;
                     });
                 }
                 appointmentsListContainer.innerHTML = html;
@@ -844,8 +859,6 @@
                 console.error(error);
                 appointmentsListContainer.innerHTML = `<div class="text-center p-4 text-red-400">Erro ao carregar agendamentos.</div>`;
             }
-            availabilityDateInput.valueAsDate = new Date();
-            loadSlotsForDate();
         };
 
         appointmentsListContainer.addEventListener('click', async (e) => {
@@ -858,6 +871,8 @@
             if (button.classList.contains('cancel-appointment-btn')) newStatus = 'Cancelado';
             
             if (id && newStatus) {
+                if(newStatus === 'Cancelado' && !confirm('Tem a certeza que deseja cancelar este agendamento? Os horários serão reabertos.')) return;
+                
                 try {
                     const { error } = await window.supabase.from('appointments').update({ status: newStatus }).eq('id', id);
                     if (error) throw error;
@@ -898,105 +913,165 @@
             }
         }
         
-        availabilityDateInput.addEventListener('change', loadSlotsForDate);
-        
-        async function loadSlotsForDate() {
-            const date = availabilityDateInput.value;
-            const container = document.getElementById('slots-for-date-container');
-            if (!date) { container.innerHTML = ''; return; }
+        // --- NEW CALENDAR LOGIC ---
+        const calendarContainer = document.getElementById('calendar-container');
+
+        const renderCalendar = async () => {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+
+            const firstDayOfMonth = new Date(year, month, 1);
+            const lastDayOfMonth = new Date(year, month + 1, 0);
+            const firstDayOfWeek = firstDayOfMonth.getDay(); // 0-6 (Sun-Sat)
+            const daysInMonth = lastDayOfMonth.getDate();
+
+            // Fetch available slots for the entire month
+            const { data: monthSlots, error } = await window.supabase
+                .from('slots')
+                .select('date')
+                .eq('status', 'available')
+                .gte('date', `${year}-${(month + 1).toString().padStart(2, '0')}-01`)
+                .lte('date', `${year}-${(month + 1).toString().padStart(2, '0')}-${daysInMonth}`);
             
-            try {
-                const { data, error } = await window.supabase.from('slots').select('*').eq('date', date).order('time');
-                if (error) throw error;
-        
-                if (data.length === 0) {
-                    container.innerHTML = `<p class="text-gray-500 mt-4">Nenhum horário definido para ${formatDate(date)}.</p>`;
-                } else {
-                    container.innerHTML = `
-                        <h4 class="font-bold mb-2 mt-4 text-gray-300">Horários para ${formatDate(date)}</h4>
-                        <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2">
-                            ${data.map(slot => `
-                                <div class="p-2 rounded-md flex justify-between items-center text-center ${slot.status === 'available' ? 'bg-green-800 text-green-200' : 'bg-red-800 text-red-200'}">
-                                    <span class="text-sm font-mono font-semibold">${formatTime(slot.time)}</span>
-                                    <button data-date="${slot.date}" data-time="${slot.time}" class="remove-slot-btn text-red-400 font-bold hover:text-red-300">&times;</button>
-                                </div>
-                            `).join('')}
-                        </div>
-                    `;
+            if(error) {
+                console.error("Error fetching month slots:", error);
+                calendarContainer.innerHTML = `<p class="text-red-400">Erro ao carregar o calendário.</p>`;
+                return;
+            }
+
+            const availableDays = new Set(monthSlots.map(slot => slot.date));
+
+            const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+            
+            let html = `
+                <div class="flex justify-between items-center mb-4">
+                    <button id="prev-month-btn" class="p-2 rounded-full hover:bg-gray-700 transition">&lt;</button>
+                    <h4 class="text-lg font-bold text-gray-200">${monthNames[month]} ${year}</h4>
+                    <button id="next-month-btn" class="p-2 rounded-full hover:bg-gray-700 transition">&gt;</button>
+                </div>
+                <div class="grid grid-cols-7 gap-2 text-center text-xs text-gray-400 mb-2">
+                    <div>Dom</div><div>Seg</div><div>Ter</div><div>Qua</div><div>Qui</div><div>Sex</div><div>Sáb</div>
+                </div>
+                <div class="grid grid-cols-7 gap-2">
+            `;
+
+            for (let i = 0; i < firstDayOfWeek; i++) {
+                html += `<div></div>`;
+            }
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateStr = `${year}-${(month + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+                const isAvailable = availableDays.has(dateStr);
+                const dayStatusClass = isAvailable ? 'bg-green-800 text-green-200' : 'bg-red-800 text-red-300';
+                
+                html += `
+                    <div data-date="${dateStr}" class="calendar-day cursor-pointer aspect-square flex items-center justify-center rounded-lg ${dayStatusClass} transition hover:ring-2 hover:ring-pink-500">
+                        ${day}
+                    </div>
+                `;
+            }
+            html += `</div>`;
+            calendarContainer.innerHTML = html;
+
+            document.getElementById('prev-month-btn').addEventListener('click', () => {
+                currentDate.setMonth(currentDate.getMonth() - 1);
+                renderCalendar();
+            });
+            document.getElementById('next-month-btn').addEventListener('click', () => {
+                currentDate.setMonth(currentDate.getMonth() + 1);
+                renderCalendar();
+            });
+            calendarContainer.querySelectorAll('.calendar-day').forEach(day => {
+                day.addEventListener('click', () => handleDayClick(day.dataset.date));
+            });
+        };
+
+        const handleDayClick = async (dateStr) => {
+            const { data: existingSlots, error } = await window.supabase
+                .from('slots')
+                .select('time')
+                .eq('date', dateStr)
+                .eq('status', 'available');
+
+            if (error) {
+                alert('Erro ao carregar horários do dia.');
+                return;
+            }
+
+            const availableTimes = new Set(existingSlots.map(s => s.time));
+            const hourlyGrid = document.getElementById('hourly-modal-grid');
+            let gridHtml = '';
+            
+            for(let hour = 6; hour <= 23; hour++) {
+                const timeStr = `${hour.toString().padStart(2, '0')}:00:00`;
+                const isActive = availableTimes.has(timeStr);
+                const activeClass = isActive ? 'bg-green-600 text-white' : 'bg-gray-600 text-gray-300';
+                gridHtml += `
+                    <button data-time="${timeStr}" class="hour-toggle p-3 rounded-lg ${activeClass} transition">
+                        ${hour.toString().padStart(2, '0')}:00
+                    </button>
+                `;
+            }
+            hourlyGrid.innerHTML = gridHtml;
+
+            document.getElementById('hourly-modal-title').textContent = `Gerir Horários - ${formatDate(dateStr, {day: '2-digit', month: '2-digit', year: 'numeric'})}`;
+            
+            hourlyGrid.querySelectorAll('.hour-toggle').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    btn.classList.toggle('bg-green-600');
+                    btn.classList.toggle('text-white');
+                    btn.classList.toggle('bg-gray-600');
+                    btn.classList.toggle('text-gray-300');
+                });
+            });
+
+            const saveBtn = document.getElementById('save-hourly-changes-btn');
+            const newSaveBtn = saveBtn.cloneNode(true);
+            saveBtn.parentNode.replaceChild(newSaveBtn, saveBtn);
+            newSaveBtn.addEventListener('click', () => handleHourlyModalSaveChanges(dateStr));
+            
+            toggleModal('hourly', true);
+        };
+
+        const handleHourlyModalSaveChanges = async (dateStr) => {
+            const grid = document.getElementById('hourly-modal-grid');
+            const selectedButtons = grid.querySelectorAll('.hour-toggle.bg-green-600');
+            const slotsToInsert = [];
+            selectedButtons.forEach(btn => {
+                slotsToInsert.push({
+                    date: dateStr,
+                    time: btn.dataset.time,
+                    status: 'available'
+                });
+            });
+
+            const { error: deleteError } = await window.supabase
+                .from('slots')
+                .delete()
+                .eq('date', dateStr)
+                .eq('status', 'available');
+
+            if (deleteError) {
+                alert('Erro ao atualizar horários: ' + deleteError.message);
+                return;
+            }
+
+            if (slotsToInsert.length > 0) {
+                const { error: insertError } = await window.supabase
+                    .from('slots')
+                    .insert(slotsToInsert);
+                
+                if(insertError) {
+                    alert('Erro ao salvar novos horários: ' + insertError.message);
+                    return;
                 }
-            } catch(error) {
-                console.error(error);
-                container.innerHTML = `<p class="text-red-400 mt-4">Erro ao carregar horários.</p>`;
             }
-        }
-        
-        document.getElementById('generate-default-slots-btn').addEventListener('click', async (e) => {
-            const date = availabilityDateInput.value;
-            if (!date) { alert('Por favor, selecione uma data primeiro.'); return; }
-            if (!confirm(`Deseja gerar horários padrão (09:00 - 18:00) para o dia ${formatDate(date)}?\nIsto não irá sobrepor horários já existentes.`)) return;
-            
-            const btn = e.target;
-            toggleButtonLoading(btn, true, 'Gerar Horários (09h-18h)');
-            
-            const slotsToInsert = Array.from({length: 10}, (_, i) => ({
-                date: date,
-                time: `${(i + 9).toString().padStart(2, '0')}:00:00`,
-                status: 'available'
-            }));
 
-            try {
-                const { error } = await window.supabase.from('slots').upsert(slotsToInsert, { onConflict: 'date,time' });
-                if (error) throw error;
-                loadSlotsForDate();
-            } catch(error) {
-                alert('Erro ao gerar horários: ' + error.message);
-            } finally {
-                toggleButtonLoading(btn, false, 'Gerar Horários (09h-18h)');
-            }
-        });
+            toggleModal('hourly', false);
+            renderCalendar();
+        };
 
-        document.getElementById('add-slot-btn').addEventListener('click', async () => {
-            const date = availabilityDateInput.value;
-            const time = document.getElementById('new-time-slot').value;
-            if (!date || !time) { alert('Selecione data e hora.'); return; }
-
-            try {
-                const { error } = await window.supabase.from('slots').insert({ date, time: `${time}:00`, status: 'available' });
-                if (error) throw error;
-                loadSlotsForDate();
-            } catch(error) {
-                 alert('Erro ao adicionar horário. Talvez já exista. ' + error.message);
-            }
-        });
-        
-        document.getElementById('close-day-btn').addEventListener('click', async () => {
-            const date = availabilityDateInput.value;
-            if (!date || !confirm(`Tem a certeza que quer apagar TODOS os horários do dia ${formatDate(date)}?`)) return;
-            
-            try {
-                const { error } = await window.supabase.from('slots').delete().eq('date', date);
-                if (error) throw error;
-                loadSlotsForDate();
-            } catch(error) {
-                alert('Erro ao fechar o dia: ' + error.message);
-            }
-        });
-        
-        document.getElementById('slots-for-date-container').addEventListener('click', async (e) => {
-            if(e.target.classList.contains('remove-slot-btn')) {
-                const date = e.target.dataset.date;
-                const time = e.target.dataset.time;
-                if (confirm(`Remover o horário das ${formatTime(time)} do dia ${formatDate(date)}?`)) {
-                    try {
-                        const { error } = await window.supabase.from('slots').delete().match({ date, time });
-                        if (error) throw error;
-                        loadSlotsForDate();
-                    } catch(error) {
-                        alert('Erro ao remover: ' + error.message);
-                    }
-                }
-            }
-        });
+        document.getElementById('close-hourly-modal-btn').addEventListener('click', () => toggleModal('hourly', false));
 
         // --- Caixa Tab ---
         const loadCaixa = async () => {
