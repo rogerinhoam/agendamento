@@ -58,8 +58,8 @@
 
         <footer class="fixed bottom-4 right-4">
              <button id="go-to-admin-login-btn" class="bg-gray-700 text-white text-xs py-1 px-3 rounded-full shadow-lg hover:bg-gray-800 transition">
-                Área Administrativa
-            </button>
+                 Área Administrativa
+             </button>
         </footer>
     </main>
 
@@ -69,12 +69,12 @@
             <div id="login-error-message" class="hidden p-3 rounded-lg mb-4 text-sm"></div>
             <form id="login-form">
                 <div class="mb-4">
-                    <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                    <input type="email" id="email-login" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-pink-500 focus:border-pink-500" required value="tata@example.com" autocomplete="email">
+                    <label for="email-login" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <input type="email" id="email-login" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-pink-500 focus:border-pink-500" required autocomplete="email">
                 </div>
                 <div class="mb-6">
-                    <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Senha</label>
-                    <input type="password" id="password-login" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-pink-500 focus:border-pink-500" required value="tata0000" autocomplete="current-password">
+                    <label for="password-login" class="block text-sm font-medium text-gray-700 mb-1">Senha</label>
+                    <input type="password" id="password-login" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-pink-500 focus:border-pink-500" required autocomplete="current-password">
                 </div>
                 <button type="submit" id="login-submit-btn" class="w-full bg-pink-500 text-white py-3 rounded-lg font-bold hover:bg-pink-600 transition-colors disabled:opacity-50">Entrar</button>
             </form>
@@ -83,7 +83,7 @@
     </main>
 
     <div id="admin-panel-view" class="min-h-screen hidden bg-gray-100">
-        <header class="bg-white shadow-md p-4 flex justify-between items-center sticky top-0 z-10">
+        <header class="bg-white shadow-md p-4 flex justify-between items-center sticky top-0 z-20">
             <h1 class="text-2xl font-bold text-pink-500">Painel Administrativo</h1>
             <button id="logout-btn" class="bg-red-500 text-white py-2 px-4 rounded-lg font-bold hover:bg-red-600 transition">Sair</button>
         </header>
@@ -139,7 +139,7 @@
                                         </tr>
                                     </thead>
                                     <tbody id="services-table-body" class="bg-white divide-y divide-gray-200">
-                                        </tbody>
+                                    </tbody>
                                 </table>
                             </div>
                         </div>
@@ -168,26 +168,13 @@
                              </div>
                         </div>
                         <div id="slots-for-date-container" class="mt-6">
-                            </div>
+                        </div>
                     </div>
 
                     <div class="bg-white p-6 rounded-xl shadow-lg">
                         <h3 class="text-xl font-bold mb-4">Todos os Agendamentos</h3>
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200">
-                                <thead class="bg-gray-50">
-                                    <tr>
-                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Serviço</th>
-                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Data/Hora</th>
-                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cliente</th>
-                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Telefone</th>
-                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ações</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="appointments-table-body" class="bg-white divide-y divide-gray-200">
-                                    </tbody>
-                            </table>
+                        <div id="appointments-list-container" class="space-y-6">
+                            <!-- Conteúdo dos cartões de agendamento será gerado via JS -->
                         </div>
                     </div>
                 </section>
@@ -236,7 +223,7 @@
                 </select>
             </div>
             <div class="flex gap-4 mt-8">
-                <button data-modal="schedule-modal-step1" class="close-modal-btn w-1/2 bg-gray-300 text-gray-800 py-3 rounded-lg hover:bg-gray-400 transition">Cancelar</button>
+                <button data-modal="step1" class="close-modal-btn w-1/2 bg-gray-300 text-gray-800 py-3 rounded-lg hover:bg-gray-400 transition">Cancelar</button>
                 <button id="continue-to-step2-btn" class="w-1/2 bg-pink-500 text-white py-3 rounded-lg font-bold hover:bg-pink-600 transition">Continuar</button>
             </div>
         </div>
@@ -271,9 +258,9 @@
         <div class="bg-white w-full max-w-lg p-6 rounded-xl shadow-lg">
             <h3 id="caixa-modal-title" class="text-xl font-bold mb-4"></h3>
             <div id="caixa-modal-content" class="max-h-96 overflow-y-auto divide-y">
-                </div>
+            </div>
             <div class="text-right font-black text-xl mt-4" id="caixa-modal-total"></div>
-            <button data-modal="caixa-details-modal" class="close-modal-btn mt-6 w-full bg-pink-500 text-white py-2 rounded-lg font-bold">Fechar</button>
+            <button data-modal="caixa" class="close-modal-btn mt-6 w-full bg-pink-500 text-white py-2 rounded-lg font-bold">Fechar</button>
         </div>
     </div>
     
@@ -334,9 +321,10 @@
         document.getElementById(elementId).classList.add('hidden');
     };
     
-    const formatDate = (dateString) => {
-        const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
-        return new Date(dateString + 'T00:00:00').toLocaleDateString('pt-BR', options);
+    const formatDate = (dateString, options = { weekday: 'long', day: '2-digit', month: 'long' }) => {
+        const date = new Date(dateString + 'T00:00:00');
+        const formatted = new Intl.DateTimeFormat('pt-BR', options).format(date);
+        return formatted.charAt(0).toUpperCase() + formatted.slice(1);
     };
     
     const formatTime = (timeString) => timeString.substring(0, 5);
@@ -386,7 +374,7 @@
                 servicesCache = data;
                 serviceSelect.innerHTML = '<option value="">Selecione um serviço</option>';
                 data.forEach(service => {
-                    serviceSelect.innerHTML += `<option value="${service.id}">${service.name} (${service.duration_minutes} min)</option>`;
+                    serviceSelect.innerHTML += `<option value="${service.id}">${service.name} (${formatCurrency(service.price)})</option>`;
                 });
             } catch (error) {
                 console.error('Erro ao carregar serviços:', error);
@@ -407,7 +395,7 @@
             timeSelect.innerHTML = '<option>A verificar horários...</option>';
             timeSelect.disabled = true;
             
-            const selectedService = servicesCache.find(s => s.id === serviceId);
+            const selectedService = servicesCache.find(s => s.id == serviceId);
             if (!selectedService) return;
             
             const slotsNeeded = Math.ceil(selectedService.duration_minutes / 60);
@@ -429,7 +417,6 @@
                 const availableTimes = availableSlots.map(s => s.time);
                 const validStartTimes = [];
                 
-                // Logic to find consecutive slots
                 for (let i = 0; i <= availableTimes.length - slotsNeeded; i++) {
                     let isSequenceValid = true;
                     for (let j = 1; j < slotsNeeded; j++) {
@@ -474,11 +461,11 @@
                 return;
             }
             
-            const service = servicesCache.find(s => s.id === serviceId);
+            const service = servicesCache.find(s => s.id == serviceId);
             currentAppointment = { service, date, time };
             
             document.getElementById('summary-service').textContent = service.name;
-            document.getElementById('summary-datetime').textContent = `${formatDate(date)} às ${formatTime(time)}`;
+            document.getElementById('summary-datetime').textContent = `${formatDate(date, {day: '2-digit', month: 'long'})} às ${formatTime(time)}`;
             
             toggleModal('step1', false);
             toggleModal('step2', true);
@@ -501,8 +488,7 @@
             const { service, date, time } = currentAppointment;
             
             try {
-                // Insert appointment
-                const { error: appointError } = await window.supabase.from('appointments').insert({
+                const { data: appointment, error: appointError } = await window.supabase.from('appointments').insert({
                     service_name: service.name,
                     appointment_date: date,
                     appointment_time: time,
@@ -511,10 +497,10 @@
                     status: 'Agendado',
                     service_id: service.id,
                     price: service.price,
-                });
+                }).select().single();
+
                 if (appointError) throw appointError;
                 
-                // Update slots status
                 const slotsNeeded = Math.ceil(service.duration_minutes / 60);
                 const startTime = new Date(`${date}T${time}`);
                 const slotsToUpdate = Array.from({ length: slotsNeeded }, (_, i) => {
@@ -524,14 +510,12 @@
                 
                 const { error: slotError } = await window.supabase
                     .from('slots')
-                    .update({ status: 'occupied' })
+                    .update({ status: 'occupied', appointment_id: appointment.id })
                     .eq('date', date)
                     .in('time', slotsToUpdate);
                 if (slotError) throw slotError;
                 
-                // Redirect to WhatsApp
-                // IMPORTANTE: Substitua SEU_NUMERO_AQUI pelo seu número de WhatsApp com código do país (ex: 5521999999999)
-                const message = `Olá, sou ${name} e gostaria de confirmar o meu agendamento para o serviço de ${service.name} no dia ${formatDate(date)} às ${formatTime(time)}. O meu telefone é ${phone}. Obrigado!`;
+                const message = `Olá, sou ${name} e gostaria de confirmar o meu agendamento para o serviço de ${service.name} no dia ${formatDate(date, {day: '2-digit', month: 'long'})} às ${formatTime(time)}. O meu telefone é ${phone}. Obrigado!`;
                 const whatsappUrl = `https://api.whatsapp.com/send?phone=SEU_NUMERO_AQUI&text=${encodeURIComponent(message)}`;
                 
                 e.target.reset();
@@ -564,7 +548,6 @@
             toggleButtonLoading(btn, true, 'Entrar');
 
             try {
-                // MELHORIA DE SEGURANÇA: A única validação é feita pelo Supabase.
                 const { data, error } = await window.supabase.auth.signInWithPassword({ email, password });
                 if (error) throw error;
                 
@@ -588,7 +571,7 @@
         // --- Dashboard & Tabs ---
         const loadAdminDashboard = () => {
             showTodaysAppointmentsAlert();
-            switchTab('services');
+            switchTab('agenda'); // Mudei para iniciar na aba 'agenda'
         };
 
         const showTodaysAppointmentsAlert = async () => {
@@ -606,13 +589,13 @@
                 if (error) throw error;
 
                 if (!data || data.length === 0) {
-                    listEl.innerHTML = '<li>Nenhum cliente agendado para hoje!</li>';
+                    alertBox.classList.add('hidden'); // Ocultar se não houver
                 } else {
                     listEl.innerHTML = data.map(app => 
                         `<li><strong>${formatTime(app.appointment_time)}</strong> - ${app.service_name} (${app.client_name})</li>`
                     ).join('');
+                     alertBox.classList.remove('hidden');
                 }
-                alertBox.classList.remove('hidden');
             } catch (error) {
                 console.error("Erro ao buscar agendamentos do dia:", error);
                 listEl.innerHTML = '<li>Erro ao carregar agendamentos.</li>';
@@ -699,7 +682,7 @@
         serviceTableBody.addEventListener('click', async (e) => {
             const id = e.target.dataset.id;
             if (e.target.classList.contains('edit-service-btn')) {
-                const service = servicesCache.find(s => s.id === id);
+                const service = servicesCache.find(s => s.id == id);
                 if (service) {
                     document.getElementById('service-form-title').textContent = 'Editar Serviço';
                     document.getElementById('service-id').value = service.id;
@@ -731,49 +714,103 @@
             document.getElementById('cancel-edit-btn').classList.add('hidden');
         }
 
-        // --- Agenda Tab ---
-        const appointmentsTableBody = document.getElementById('appointments-table-body');
+        // --- Agenda Tab (Redesigned Card View) ---
+        const appointmentsListContainer = document.getElementById('appointments-list-container');
         const availabilityDateInput = document.getElementById('availability-date');
         
         const loadAdminAgenda = async () => {
             try {
-                const { data, error } = await window.supabase.from('appointments').select('*').order('appointment_date', { ascending: false }).order('appointment_time');
+                const { data, error } = await window.supabase
+                    .from('appointments')
+                    .select('*, services(duration_minutes)')
+                    .order('appointment_date', { ascending: false })
+                    .order('appointment_time');
                 if (error) throw error;
-                
-                appointmentsTableBody.innerHTML = data.map(app => {
-                    let statusClass = 'bg-blue-100 text-blue-800';
-                    if (app.status === 'Concluído') statusClass = 'bg-green-100 text-green-800';
-                    if (app.status === 'Cancelado') statusClass = 'bg-red-100 text-red-800';
-                    
-                    return `
-                        <tr>
-                            <td class="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${app.service_name}</td>
-                            <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">${formatDate(app.appointment_date)} ${formatTime(app.appointment_time)}</td>
-                            <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">${app.client_name}</td>
-                            <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">${app.client_phone}</td>
-                            <td class="px-4 py-4 whitespace-nowrap text-sm"><span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusClass}">${app.status}</span></td>
-                            <td class="px-4 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                                ${app.status === 'Agendado' ? `
-                                    <button data-id="${app.id}" class="conclude-appointment-btn text-green-600 hover:text-green-900">Concluir</button>
-                                    <button data-id="${app.id}" class="cancel-appointment-btn text-red-600 hover:text-red-900">Cancelar</button>
-                                ` : ''}
-                            </td>
-                        </tr>
-                    `;
-                }).join('');
+
+                const today = new Date().toISOString().split('T')[0];
+
+                const groupedAppointments = data.reduce((acc, app) => {
+                    const date = app.appointment_date;
+                    if (!acc[date]) acc[date] = [];
+                    acc[date].push(app);
+                    return acc;
+                }, {});
+
+                const sortedDates = Object.keys(groupedAppointments).sort((a, b) => new Date(b) - new Date(a));
+
+                let html = '';
+                if (sortedDates.length === 0) {
+                    html = `<div class="text-center p-8 text-gray-500">Nenhum agendamento encontrado.</div>`;
+                } else {
+                    sortedDates.forEach(date => {
+                        html += `
+                            <div class="date-group">
+                                <h4 class="text-lg font-bold text-gray-800 mb-3 sticky top-[68px] bg-gray-100 py-2 z-10">
+                                    ${formatDate(date)} 
+                                    ${date === today ? '<span class="ml-2 px-2 py-0.5 text-xs rounded-full bg-pink-500 text-white font-semibold">HOJE</span>' : ''}
+                                </h4>
+                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        `;
+
+                        groupedAppointments[date].forEach(app => {
+                            let statusClass = 'bg-blue-100 text-blue-800';
+                            if (app.status === 'Concluído') statusClass = 'bg-green-100 text-green-800';
+                            if (app.status === 'Cancelado') statusClass = 'bg-red-100 text-red-800';
+
+                            let cardClass = 'border-l-4 p-4 bg-white rounded-r-lg shadow-sm';
+                            if (app.appointment_date < today) {
+                                cardClass += ' border-gray-300 opacity-75';
+                            } else if (app.appointment_date === today) {
+                                cardClass += ' border-pink-400 bg-pink-50';
+                            } else {
+                                cardClass += ' border-blue-400';
+                            }
+
+                            html += `
+                                <div class="${cardClass}">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <p class="font-bold text-2xl text-gray-800">${formatTime(app.appointment_time)}</p>
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusClass}">${app.status}</span>
+                                        </div>
+                                        <p class="font-bold text-lg text-green-600">${formatCurrency(app.price)}</p>
+                                    </div>
+                                    <div class="mt-4">
+                                        <p class="font-bold text-gray-900">${app.client_name}</p>
+                                        <p class="text-sm text-gray-600">${app.service_name}</p>
+                                        <p class="text-sm text-gray-500 mt-1">${app.client_phone}</p>
+                                    </div>
+                                    ${app.status === 'Agendado' ? `
+                                    <div class="mt-4 pt-3 border-t flex gap-2">
+                                        <button data-id="${app.id}" class="conclude-appointment-btn w-full text-sm bg-green-500 text-white py-1 px-3 rounded hover:bg-green-600">Concluir</button>
+                                        <button data-id="${app.id}" class="cancel-appointment-btn w-full text-sm bg-red-500 text-white py-1 px-3 rounded hover:bg-red-600">Cancelar</button>
+                                    </div>
+                                    ` : ''}
+                                </div>
+                            `;
+                        });
+
+                        html += `</div></div>`; // Close grid and date-group
+                    });
+                }
+                appointmentsListContainer.innerHTML = html;
+
             } catch (error) {
                 console.error(error);
-                appointmentsTableBody.innerHTML = `<tr><td colspan="6" class="text-center p-4 text-red-500">Erro ao carregar agendamentos.</td></tr>`;
+                appointmentsListContainer.innerHTML = `<div class="text-center p-4 text-red-500">Erro ao carregar agendamentos.</div>`;
             }
             availabilityDateInput.valueAsDate = new Date();
             loadSlotsForDate();
         };
 
-        appointmentsTableBody.addEventListener('click', async (e) => {
-            const id = e.target.dataset.id;
+        appointmentsListContainer.addEventListener('click', async (e) => {
+            const button = e.target.closest('button');
+            if (!button) return;
+
+            const id = button.dataset.id;
             let newStatus = '';
-            if (e.target.classList.contains('conclude-appointment-btn')) newStatus = 'Concluído';
-            if (e.target.classList.contains('cancel-appointment-btn')) newStatus = 'Cancelado';
+            if (button.classList.contains('conclude-appointment-btn')) newStatus = 'Concluído';
+            if (button.classList.contains('cancel-appointment-btn')) newStatus = 'Cancelado';
             
             if (id && newStatus) {
                 try {
@@ -791,7 +828,7 @@
             try {
                 const { data: appData, error } = await window.supabase
                     .from('appointments')
-                    .select('appointment_date, appointment_time, services(duration_minutes)')
+                    .select('appointment_date, appointment_time, service_id, services(duration_minutes)')
                     .eq('id', appointmentId)
                     .single();
         
@@ -806,7 +843,7 @@
                 
                 const { error: updateError } = await window.supabase
                     .from('slots')
-                    .update({ status: 'available' })
+                    .update({ status: 'available', appointment_id: null })
                     .eq('date', appData.appointment_date)
                     .in('time', slotsToFree);
                 if (updateError) throw updateError;
@@ -968,7 +1005,7 @@
                     <div class="p-3 flex justify-between items-center">
                         <div>
                             <p class="font-semibold">${item.service_name}</p>
-                            <p class="text-sm text-gray-600">Cliente: ${item.client_name} - ${formatDate(item.appointment_date)}</p>
+                            <p class="text-sm text-gray-600">Cliente: ${item.client_name} - ${new Date(item.appointment_date + 'T00:00:00').toLocaleDateString('pt-BR')}</p>
                         </div>
                         <div class="font-bold text-green-600">${formatCurrency(item.price || 0)}</div>
                     </div>
