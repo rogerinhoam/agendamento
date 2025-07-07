@@ -3,1225 +3,1170 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tatá Nail Details - Agendamento</title>
+    <title>Thainara Correia - Sistema de Agendamento</title>
     
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
+    <!-- Fontes do Google -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;700;900&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Dancing+Script:wght@700&family=Exo+2:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
-    <script type="module">
-        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
-        // As suas chaves Supabase - Mantenha-as aqui. A chave 'anon' é segura para ser exposta.
-        window.supabase = createClient(
-            'https://ithaezbnrquukbgdurvn.supabase.co',
-            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml0aGFlemJucnF1dWtiZ2R1cnZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTEzODIwNTMsImV4cCI6MjA2Njk1ODA1M30.CaIbMFaZag0IFPbaZfSdG4tw5KVsbnN5XPIGvzh1Q38'
-        );
-    </script>
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
-        /* Tema Dark Pink com detalhes dourados */
-        body {
-            font-family: 'Exo 2', sans-serif;
-            --bg-dark: #111827; /* Tailwind gray-900 - Tom escuro azulado/cinza */
-            --bg-light: #1f2937; /* Tailwind gray-800 */
-            --pink-main: #f472b6; /* Tailwind pink-400 */
-            --pink-dark: #ec4899;  /* Tailwind pink-500 */
-            --gold-main: #d4af37;
-            --text-light: #e5e7eb; /* Tailwind gray-200 */
-            --text-dark: #9ca3af;   /* Tailwind gray-400 */
+        :root {
+            --bg-dark-primary: #0d1218; --bg-dark-secondary: #1f2937; --bg-modal: #111827;
+            --border-color: #374151; --text-primary: #f9fafb; --text-secondary: #9ca3af;
+            --pink-accent: #ec4899; --pink-hover: #f472b6; --gold-main: #d4af37;
+            --green-available: #16a34a; --red-closed: #be123c; --yellow-booked: #d97706;
+            --blue-info: #3b82f6; --red-error: #ef4444;
         }
-        .glossy-button {
-            background: linear-gradient(145deg, var(--pink-main), var(--pink-dark));
-            border: 1px solid var(--pink-main);
-            color: white;
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
-            transition: all 0.3s ease;
-            box-shadow: 0 0 15px rgba(244, 114, 182, 0.4), 
-                        inset 0 1px 2px rgba(255, 255, 255, 0.3);
-            animation: pulse-glow 4s infinite ease-in-out; /* Added pulse animation */
-        }
-        .glossy-button:hover {
-            transform: translateY(-3px) scale(1.05);
-            box-shadow: 0 0 25px rgba(244, 114, 182, 0.6), 
-                        inset 0 1px 2px rgba(255, 255, 255, 0.4);
-        }
-        .glossy-button:active {
-            transform: translateY(1px) scale(1);
-        }
-        .gold-shadow {
-            text-shadow: 0px 0px 8px rgba(212, 175, 55, 0.4);
-        }
-        /* Custom scrollbar for webkit browsers */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: var(--bg-light);
-        }
-        ::-webkit-scrollbar-thumb {
-            background-color: var(--pink-dark);
-            border-radius: 10px;
-            border: 2px solid var(--bg-light);
-        }
-        /* Calendar-specific styles */
-        .calendar-day.other-month {
-            opacity: 0.3;
-        }
-        .calendar-day {
-            transition: all 0.2s ease-in-out;
-        }
-        .calendar-day:hover {
-            transform: scale(1.05);
-            border-color: var(--pink-main);
-        }
-
-        /* --- NEW ANIMATIONS --- */
-
-        /* Floating animation for the logo */
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-15px); }
-        }
-        .float-animation {
-            animation: float 7s ease-in-out infinite;
-        }
+        body { font-family: 'Poppins', sans-serif; background-color: var(--bg-dark-primary); color: var(--text-primary); }
+        #client-view, #admin-view { display: none; }
+        #client-view { font-family: 'Exo 2', sans-serif; }
+        .sparkle-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; background-color: var(--bg-dark-primary); }
+        @keyframes sparkle { 0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; } 100% { transform: translateY(110vh) rotate(360deg); opacity: 0; } }
+        .sparkle { position: absolute; top: -10vh; background-color: var(--pink-hover); border-radius: 50%; box-shadow: 0 0 5px var(--pink-hover), 0 0 10px var(--pink-hover); animation: sparkle 20s linear infinite; }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        .float-animation { animation: float 6s ease-in-out infinite; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-on-load { opacity: 0; animation: fadeIn 1s ease-out forwards; }
+        .logo-initials { animation-delay: 0.2s; } .logo-name { animation-delay: 0.8s; } .logo-title { animation-delay: 1.0s; } .main-button { animation-delay: 1.4s; } .footer-links { animation-delay: 1.8s; }
+        .font-logo-serif { font-family: 'Playfair Display', serif; font-weight: 700; }
+        .modal-backdrop { transition: opacity 0.3s ease-in-out; }
+        .modal-content { transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out; }
+        .modal-hidden { pointer-events: none; }
+        .modal-hidden .modal-backdrop { opacity: 0; }
+        .modal-hidden .modal-content { transform: scale(0.95); opacity: 0; }
+        .date-selector { display: flex; gap: 0.75rem; overflow-x: auto; padding-bottom: 1rem; scrollbar-width: thin; scrollbar-color: var(--pink-accent) var(--bg-dark-secondary); }
+        .date-selector::-webkit-scrollbar { height: 8px; }
+        .date-selector::-webkit-scrollbar-track { background: var(--bg-dark-secondary); }
+        .date-selector::-webkit-scrollbar-thumb { background-color: var(--pink-accent); border-radius: 10px; border: 2px solid var(--bg-dark-secondary); }
+        .date-box { flex-shrink: 0; width: 60px; height: 70px; border: 2px solid var(--border-color); border-radius: 0.5rem; cursor: pointer; transition: all 0.2s ease; }
+        .date-box:hover { border-color: var(--pink-hover); }
+        .date-box.selected { background-color: var(--pink-accent); border-color: var(--pink-accent); color: white; transform: scale(1.05); }
+        .date-box.disabled { background-color: var(--grey-dark); border-color: var(--grey-dark); color: #9ca3af; cursor: not-allowed; }
+        .time-slot { transition: all 0.2s ease; }
+        .time-slot.available:hover { background-color: var(--pink-accent); border-color: var(--pink-accent); color: white; }
+        .time-slot.selected { background-color: var(--pink-accent); border-color: var(--pink-accent); color: white; font-weight: bold; }
+        .time-slot.unavailable { background-color: var(--grey-dark); border-color: var(--grey-dark); color: #9ca3af; cursor: not-allowed; text-decoration: line-through; }
+        #admin-panel, #login-screen { display: none; }
+        .sidebar-link { transition: all 0.2s ease-in-out; }
+        .sidebar-link:hover, .sidebar-link.active { background-color: var(--pink-accent); color: white; }
+        .sidebar-link.active svg, .sidebar-link:hover svg { color: white; }
+        .sidebar-link svg { color: var(--text-secondary); transition: all 0.2s ease-in-out; }
+        .form-input, .form-select, .form-checkbox { background-color: #374151; border-color: #4b5563; }
+        .form-input:focus, .form-select:focus, .form-checkbox:focus { --tw-ring-color: var(--pink-accent); border-color: var(--pink-accent); }
+        .form-checkbox { color: var(--pink-accent); }
+        .btn-primary { background-color: var(--pink-accent); } .btn-primary:hover { background-color: var(--pink-hover); }
+        .btn-secondary { background-color: var(--bg-dark-primary); border: 1px solid var(--border-color); } .btn-secondary:hover { background-color: var(--border-color); }
+        .loader { border-top-color: var(--pink-accent); }
+        .admin-calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; background-color: var(--border-color); border: 1px solid var(--border-color); }
+        .admin-calendar-day { background-color: var(--bg-dark-secondary); transition: all 0.2s ease; cursor: pointer; }
+        .admin-calendar-day.other-month { background-color: #1f293780; color: var(--text-secondary); cursor: default; }
+        .admin-calendar-day.today { border: 2px solid var(--gold-main) !important; }
+        .admin-calendar-day.selected { border: 2px solid var(--pink-accent) !important; background-color: #374151; }
+        .admin-calendar-day.open { background-color: var(--green-available); }
+        .admin-calendar-day.closed { background-color: var(--red-closed); }
+        .admin-calendar-day:not(.other-month):hover { filter: brightness(1.2); }
+        .admin-slot { transition: all 0.2s ease; border-radius: 0.5rem; }
+        .admin-slot.available { background-color: var(--green-available); cursor: pointer; }
+        .admin-slot.available:hover { filter: brightness(1.2); }
+        .admin-slot.closed { background-color: var(--red-closed); cursor: pointer; }
+        .admin-slot.closed:hover { filter: brightness(1.2); }
+        .admin-slot.booked { background-color: var(--yellow-booked); cursor: not-allowed; }
         
-        /* Pulsing glow animation for the button */
-        @keyframes pulse-glow {
-            0%, 100% {
-                box-shadow: 0 0 15px rgba(244, 114, 182, 0.4), 
-                            inset 0 1px 2px rgba(255, 255, 255, 0.3);
-            }
-            50% {
-                box-shadow: 0 0 30px rgba(244, 114, 182, 0.8), 
-                            inset 0 1px 2px rgba(255, 255, 255, 0.4);
-            }
+        /* Estilos para o Toast de Notificação */
+        #toast-notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 100;
+            transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+            transform: translateY(100px);
+            opacity: 0;
         }
-
-        /* Sparkle container */
-        .sparkle-container {
-            position: relative;
-            overflow: hidden;
-        }
-
-        @keyframes sparkle {
-            0% { transform: translateY(0vh) rotate(0deg); opacity: 1; }
-            100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
-        }
-
-        .sparkle {
-            position: absolute;
-            background-color: var(--pink-main);
-            border-radius: 50%;
-            box-shadow: 0 0 5px var(--pink-main), 0 0 10px var(--pink-main);
-            animation: sparkle 20s linear infinite;
+        #toast-notification.show {
+            transform: translateY(0);
+            opacity: 1;
         }
     </style>
 </head>
-<body class="bg-[#111827] text-gray-200">
+<body class="antialiased">
 
-    <main id="client-view" class="min-h-screen flex flex-col items-center justify-center p-4 text-center sparkle-container">
-        <!-- New Logo Section with animation -->
-        <div class="text-center mb-12 float-animation">
-            <!-- Initials -->
-            <h1 class="font-serif text-9xl md:text-[10rem] mb-0 leading-none">
-                <span class="text-gray-400">T</span><span class="text-pink-400 italic -ml-12 md:-ml-16">C</span>
-            </h1>
-            <!-- Full Name -->
-            <p class="text-4xl md:text-5xl text-gray-200 -mt-4" style="font-family: 'Dancing Script', cursive;">Thainara Correia</p>
-            <!-- Title -->
-            <div class="flex items-center justify-center gap-2 mt-2">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="text-gray-400" viewBox="0 0 16 16">
-                    <path d="M5.5 2.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-4a.5.5 0 0 1-.5-.5v-1z"/>
-                    <path d="M3.5 5a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-1z"/>
-                    <path d="M2.5 7.5a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 .5.5v5a1.5 1.5 0 0 1-1.5 1.5h-7A1.5 1.5 0 0 1 3 12.5v-5a.5.5 0 0 1 .5-.5z"/>
-                </svg>
-                <p class="text-lg tracking-widest text-gray-400">NAILS DESIGNER</p>
-            </div>
-        </div>
-        
-        <button id="open-schedule-modal-btn" class="glossy-button text-2xl font-bold uppercase tracking-widest py-4 px-12 rounded-full">
-            Agendar Horário
-        </button>
-
-        <div class="absolute bottom-8">
-            <a href="https://www.instagram.com/thaicorreia.nails" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-pink-400 transition-colors p-2">
-                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-instagram"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
-            </a>
-        </div>
-
-        <footer class="fixed bottom-4 right-4">
-             <button id="go-to-admin-login-btn" class="bg-gray-700 text-white text-xs py-1 px-3 rounded-full shadow-lg hover:bg-gray-600 transition">
-                 Área Administrativa
-             </button>
-        </footer>
-    </main>
-
-    <main id="admin-login-view" class="min-h-screen hidden flex-col items-center justify-center p-4 bg-gray-900 bg-opacity-80">
-        <div class="w-full max-w-sm bg-[#1f2937] p-8 rounded-2xl shadow-2xl border border-gray-700">
-            <h2 class="text-3xl font-bold text-center text-pink-400 mb-8 gold-shadow">Acesso Admin</h2>
-            <div id="login-error-message" class="hidden p-3 rounded-lg mb-4 text-sm"></div>
-            <form id="login-form">
-                <div class="mb-4">
-                    <label for="email-login" class="block text-sm font-medium text-gray-300 mb-1">Email</label>
-                    <input type="email" id="email-login" class="w-full px-4 py-2 bg-gray-700 border border-gray-600 text-gray-200 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition" required autocomplete="email">
-                </div>
-                <div class="mb-6">
-                    <label for="password-login" class="block text-sm font-medium text-gray-300 mb-1">Senha</label>
-                    <input type="password" id="password-login" class="w-full px-4 py-2 bg-gray-700 border border-gray-600 text-gray-200 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition" required autocomplete="current-password">
-                </div>
-                <button type="submit" id="login-submit-btn" class="w-full bg-pink-500 text-white py-3 rounded-lg font-bold hover:bg-pink-600 transition-colors disabled:opacity-50">Entrar</button>
-            </form>
-            <button id="back-to-client-view-btn" class="w-full mt-4 bg-gray-600 text-gray-200 py-2 rounded-lg text-sm hover:bg-gray-500 transition">Voltar</button>
-        </div>
-    </main>
-
-    <div id="admin-panel-view" class="min-h-screen hidden bg-[#111827]">
-        <header class="bg-[#1f2937] shadow-lg border-b border-gray-700 p-4 flex justify-between items-center sticky top-0 z-20">
-            <h1 class="text-2xl font-bold text-pink-400 gold-shadow">Painel Administrativo</h1>
-            <button id="logout-btn" class="bg-pink-800 text-white py-2 px-4 rounded-lg font-bold hover:bg-pink-700 transition">Sair</button>
+    <!-- VIEW DO CLIENTE -->
+    <div id="client-view" class="w-full h-full">
+        <div class="sparkle-container" id="sparkle-bg"></div>
+        <header class="absolute top-0 right-0 p-4 sm:p-6 z-30 animate-on-load admin-link">
+            <a href="#/admin" class="text-gray-400 hover:text-white transition-colors duration-300" title="Área Administrativa" aria-label="Acessar área administrativa"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" viewBox="0 0 16 16"><path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/><path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z"/></svg></a>
         </header>
-
-        <main class="p-4">
-            <div id="todays-appointments-alert" class="hidden m-4 p-4 bg-blue-900 bg-opacity-50 border-l-4 border-blue-400 text-blue-200 rounded-r-lg relative">
-                <button id="close-alert-btn" class="absolute top-1 right-2 text-xl font-bold text-blue-300 hover:text-white">&times;</button>
-                <p class="font-bold mb-2">Próximos Clientes do Dia:</p>
-                <ul id="todays-appointments-list" class="list-disc list-inside text-sm"></ul>
+        <main class="min-h-screen w-full flex flex-col items-center justify-center p-6 text-center z-10">
+            <div class="float-animation">
+                <div class="relative logo-initials animate-on-load"><h1 class="text-8xl sm:text-9xl md:text-[10rem] mb-0 leading-none"><span class="text-gray-400 font-logo-serif">T</span><span class="text-pink-400 italic -ml-12 sm:-ml-14 md:-ml-20">C</span></h1></div>
+                <p class="text-4xl md:text-5xl text-gray-200 -mt-2 md:-mt-4 logo-name animate-on-load" style="font-family: 'Dancing Script', cursive;">Thainara Correia</p>
+                <div class="flex items-center justify-center gap-2 mt-2 logo-title animate-on-load"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="text-gray-400" viewBox="0 0 16 16"><path d="M5.5 2.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-4a.5.5 0 0 1-.5-.5v-1z"/><path d="M3.5 5a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-1z"/><path d="M2.5 7.5a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 .5.5v5a1.5 1.5 0 0 1-1.5 1.5h-7A1.5 1.5 0 0 1 3 12.5v-5a.5.5 0 0 1 .5-.5z"/></svg><p class="text-lg tracking-widest text-gray-400 font-light">NAILS DESIGNER</p></div>
             </div>
-
-            <div class="border-b border-gray-700">
-                <nav id="admin-tabs" class="-mb-px flex space-x-8" aria-label="Tabs">
-                    <button data-tab="agendamentos" class="admin-tab whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">Agendamentos</button>
-                    <button data-tab="disponibilidade" class="admin-tab whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">Disponibilidade</button>
-                    <button data-tab="services" class="admin-tab whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">Serviços</button>
-                    <button data-tab="caixa" class="admin-tab whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">Caixa</button>
-                </nav>
+            <div class="mt-12 main-button animate-on-load">
+                <button id="open-booking-modal" class="group relative inline-flex items-center justify-center gap-3 bg-gradient-to-r from-pink-500 to-fuchsia-500 text-white font-bold py-3 px-8 rounded-full text-lg uppercase tracking-wider shadow-lg shadow-pink-500/30 transform hover:scale-105 transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-pink-500"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 transition-transform duration-300 group-hover:-translate-y-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg><span class="transition-transform duration-300 group-hover:-translate-y-1">Agendar Horário</span><span class="absolute bottom-0 left-0 w-full h-1 bg-white/50 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-in-out"></span></button>
             </div>
-
-            <div class="mt-8">
-                 <section id="agendamentos-tab-content" class="admin-tab-content hidden">
-                    <div class="bg-[#1f2937] border border-gray-700 p-6 rounded-xl shadow-lg">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-xl font-bold text-gray-200">Todos os Agendamentos</h3>
-                            <button id="clean-cancelled-btn" class="bg-yellow-800 text-yellow-200 text-xs py-1 px-3 rounded-full hover:bg-yellow-700 transition">
-                                Limpar Cancelados
-                            </button>
-                        </div>
-                        <div id="appointments-list-container" class="space-y-6">
-                            <!-- Appointment cards will be rendered here by JS -->
-                        </div>
-                    </div>
-                 </section>
-
-                 <section id="disponibilidade-tab-content" class="admin-tab-content hidden">
-                    <div class="bg-[#1f2937] border border-gray-700 p-6 rounded-xl shadow-lg mb-8">
-                        <h3 class="text-xl font-bold mb-4 text-gray-200">Gerir Disponibilidade</h3>
-                        <div id="calendar-container">
-                            <!-- Calendar will be rendered here by JS -->
-                        </div>
-                    </div>
-                </section>
-
-                <section id="services-tab-content" class="admin-tab-content hidden">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        <div class="md:col-span-1 bg-[#1f2937] border border-gray-700 p-6 rounded-xl shadow-lg">
-                            <h3 id="service-form-title" class="text-xl font-bold mb-4 text-gray-200">Adicionar Novo Serviço</h3>
-                            <form id="service-form">
-                                <input type="hidden" id="service-id">
-                                <div class="mb-4">
-                                    <label for="service-name" class="block text-sm font-medium text-gray-400">Nome do Serviço</label>
-                                    <input type="text" id="service-name" class="mt-1 w-full p-2 bg-gray-700 border-gray-600 rounded-md" required>
-                                </div>
-                                <div class="mb-4">
-                                    <label for="service-duration" class="block text-sm font-medium text-gray-400">Duração (minutos)</label>
-                                    <input type="number" id="service-duration" class="mt-1 w-full p-2 bg-gray-700 border-gray-600 rounded-md" required>
-                                </div>
-                                <div class="mb-4">
-                                    <label for="service-price" class="block text-sm font-medium text-gray-400">Preço (R$)</label>
-                                    <input type="number" step="0.01" id="service-price" inputmode="decimal" class="mt-1 w-full p-2 bg-gray-700 border-gray-600 rounded-md" required>
-                                </div>
-                                <button type="submit" class="w-full bg-green-600 text-white py-2 rounded-md font-bold hover:bg-green-500 transition">Salvar Serviço</button>
-                                <button type="button" id="cancel-edit-btn" class="hidden w-full mt-2 bg-gray-600 text-white py-2 rounded-md hover:bg-gray-500 transition">Cancelar Edição</button>
-                            </form>
-                        </div>
-                        <div class="md:col-span-2 bg-[#1f2937] border border-gray-700 p-6 rounded-xl shadow-lg">
-                            <h3 class="text-xl font-bold mb-4 text-gray-200">Lista de Serviços</h3>
-                            <div class="overflow-x-auto">
-                                <table class="min-w-full divide-y divide-gray-700">
-                                    <thead class="bg-gray-800">
-                                        <tr>
-                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">Serviço</th>
-                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">Duração</th>
-                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">Preço</th>
-                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">Ações</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="services-table-body" class="divide-y divide-gray-700">
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <section id="caixa-tab-content" class="admin-tab-content hidden">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div id="caixa-dia-card" class="bg-[#1f2937] border border-gray-700 p-6 rounded-xl shadow-lg cursor-pointer hover:shadow-2xl hover:border-pink-500 transition-all">
-                            <h4 class="text-lg font-bold text-gray-400">Caixa do Dia</h4>
-                            <p id="caixa-dia-total" class="text-3xl font-black text-green-400 mt-2">R$ 0,00</p>
-                            <p id="caixa-dia-count" class="text-sm text-gray-500">0 serviços</p>
-                        </div>
-                        <div id="caixa-semana-card" class="bg-[#1f2937] border border-gray-700 p-6 rounded-xl shadow-lg cursor-pointer hover:shadow-2xl hover:border-pink-500 transition-all">
-                            <h4 class="text-lg font-bold text-gray-400">Caixa da Semana</h4>
-                            <p id="caixa-semana-total" class="text-3xl font-black text-green-400 mt-2">R$ 0,00</p>
-                            <p id="caixa-semana-count" class="text-sm text-gray-500">0 serviços</p>
-                        </div>
-                        <div id="caixa-mes-card" class="bg-[#1f2937] border border-gray-700 p-6 rounded-xl shadow-lg cursor-pointer hover:shadow-2xl hover:border-pink-500 transition-all">
-                            <h4 class="text-lg font-bold text-gray-400">Caixa do Mês</h4>
-                            <p id="caixa-mes-total" class="text-3xl font-black text-green-400 mt-2">R$ 0,00</p>
-                            <p id="caixa-mes-count" class="text-sm text-gray-500">0 serviços</p>
-                        </div>
-                    </div>
-                </section>
-            </div>
+            <footer class="absolute bottom-6 footer-links animate-on-load">
+                <div class="flex items-center gap-6">
+                    <a id="whatsapp-link" href="#" target="_blank" class="text-gray-400 hover:text-white transition-colors duration-300" title="WhatsApp" aria-label="Entrar em contato pelo WhatsApp"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" viewBox="0 0 16 16"><path d="M13.601 2.326A7.85 7.85 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.9 7.9 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.9 7.9 0 0 0 13.6 2.326zM7.994 14.521a6.6 6.6 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.56 6.56 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592m3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.068-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.197.197-.331.065-.133.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.73.73 0 0 0-.529.247c-.182.198-.691.677-.691 1.654s.71 1.916.81 2.049c.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z"/></svg></a>
+                    <a id="instagram-link" href="#" target="_blank" class="text-gray-400 hover:text-white transition-colors duration-300" title="Instagram" aria-label="Visitar perfil no Instagram"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" viewBox="0 0 16 16"><path d="M8 0C5.829 0 5.556.01 4.703.048 3.85.088 3.269.222 2.76.42a3.9 3.9 0 0 0-1.417.923A3.9 3.9 0 0 0 .42 2.76C.222 3.268.087 3.85.048 4.703.01 5.556 0 5.829 0 8s.01 2.444.048 3.297c.04.852.174 1.433.372 1.942.205.526.478.972.923 1.417.444.445.89.719 1.416.923.51.198 1.09.333 1.942.372C5.556 15.99 5.829 16 8 16s2.444-.01 3.297-.048c.852-.04 1.433-.174 1.942-.372.526-.205.972-.478 1.417-.923.445-.444.718-.891.923-1.417.198-.51.333-1.09.372-1.942C15.99 10.444 16 10.171 16 8s-.01-2.444-.048-3.297c-.04-.852-.174-1.433-.372-1.942a3.9 3.9 0 0 0-.923-1.417A3.9 3.9 0 0 0 13.24.42c-.51-.198-1.09-.333-1.942-.372C10.444.01 10.171 0 8 0zm0 1.442c2.136 0 2.389.007 3.232.046.78.035 1.204.166 1.486.275.373.145.64.319.92.599.28.28.453.546.598.92.11.282.24.705.275 1.486.039.843.047 1.096.047 3.232s-.008 2.389-.047 3.232c-.035.78-.166 1.203-.275 1.485a2.5 2.5 0 0 1-.598.92c-.28.28-.546-.453-.92-.598-.282-.11-.705-.24-1.485-.276-.843.038-1.096.047-3.232.047s-2.389-.009-3.232-.047c-.78-.036-1.203-.166-1.485-.276a2.5 2.5 0 0 1-.92-.598 2.5 2.5 0 0 1-.598-.92c-.11-.282-.24-.705-.276-1.485C1.442 10.444 1.434 10.17 1.434 8s.008-2.389.047-3.232c.036-.78.166-1.204.276-1.486.145-.373.319-.64.598-.92.28-.28.546-.453.92-.598.282-.11.705-.24 1.485-.276C5.611 1.449 5.864 1.442 8 1.442zM8 4.202a3.797 3.797 0 1 0 0 7.594 3.797 3.797 0 0 0 0-7.594zM8 10.398a2.398 2.398 0 1 1 0-4.796 2.398 2.398 0 0 1 0 4.796zm4.804-6.402a.96.96 0 1 0 0-1.92.96.96 0 0 0 0 1.92z"/></svg></a>
+                </div>
+            </footer>
         </main>
     </div>
-    
-    <!-- Client Modals -->
-    <div id="schedule-modal-step1" class="fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
-        <div class="bg-[#1f2937] w-full max-w-md p-8 rounded-2xl shadow-2xl border border-gray-700">
-            <h2 class="text-2xl font-bold mb-6 text-center text-pink-400 gold-shadow">Faça o seu Agendamento</h2>
-            <div id="step1-message" class="hidden p-3 rounded-lg mb-4 text-sm"></div>
-            <div class="mb-4">
-                <label for="service-select" class="block text-sm font-medium mb-1 text-gray-300">1. Escolha o serviço</label>
-                <select id="service-select" class="w-full p-3 bg-gray-700 border border-gray-600 rounded-md text-gray-200 focus:ring-2 focus:ring-pink-500">
-                    <option value="">A carregar serviços...</option>
-                </select>
-            </div>
-            <div class="mb-4">
-                <label for="date-select" class="block text-sm font-medium mb-1 text-gray-300">2. Escolha a data</label>
-                <input type="date" id="date-select" class="w-full p-3 bg-gray-700 border border-gray-600 rounded-md text-gray-200 focus:ring-2 focus:ring-pink-500">
-            </div>
-            <div class="mb-4">
-                <label for="time-select" class="block text-sm font-medium mb-1 text-gray-300">3. Escolha o horário</label>
-                <select id="time-select" class="w-full p-3 bg-gray-700 border border-gray-600 rounded-md text-gray-200 focus:ring-2 focus:ring-pink-500" disabled>
-                    <option>Selecione o serviço e a data</option>
-                </select>
-            </div>
-            <div class="flex gap-4 mt-8">
-                <button data-modal="step1" class="close-modal-btn w-1/2 bg-gray-600 text-gray-200 py-3 rounded-lg hover:bg-gray-500 transition">Cancelar</button>
-                <button id="continue-to-step2-btn" class="w-1/2 bg-pink-500 text-white py-3 rounded-lg font-bold hover:bg-pink-600 transition">Continuar</button>
+
+    <!-- VIEW DO PAINEL ADMINISTRATIVO -->
+    <div id="admin-view" class="w-full h-full">
+        <!-- Tela de Login -->
+        <div id="login-screen" class="flex items-center justify-center min-h-screen w-full">
+            <div class="w-full max-w-md p-8 space-y-8 bg-gray-800 rounded-2xl shadow-lg">
+                <div class="text-center"><h2 class="text-3xl font-bold text-white">Acesso Administrativo</h2><p class="mt-2 text-gray-400">Entre com suas credenciais</p></div>
+                <form id="login-form" class="space-y-6">
+                    <div><label for="email" class="text-sm font-medium text-gray-300">Email</label><input id="email" name="email" type="email" autocomplete="email" required class="w-full px-3 py-2 mt-1 text-white rounded-md form-input focus:outline-none focus:ring-2 focus:ring-pink-500"></div>
+                    <div><label for="password" class="text-sm font-medium text-gray-300">Senha</label><input id="password" name="password" type="password" autocomplete="current-password" required class="w-full px-3 py-2 mt-1 text-white rounded-md form-input focus:outline-none focus:ring-2 focus:ring-pink-500"></div>
+                    <div id="login-error" class="hidden text-red-400 text-sm text-center"></div>
+                    <div><button type="submit" class="w-full px-4 py-2 font-semibold text-white transition duration-200 ease-in-out rounded-md btn-primary">Entrar</button></div>
+                </form>
             </div>
         </div>
-    </div>
 
-    <div id="schedule-modal-step2" class="fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
-        <div class="bg-[#1f2937] w-full max-w-md p-8 rounded-2xl shadow-2xl border border-gray-700">
-            <h2 class="text-2xl font-bold mb-2 text-center text-pink-400 gold-shadow">Confirme o seu Agendamento</h2>
-            <div class="bg-gray-800 p-4 rounded-lg text-center mb-6">
-                <p class="font-bold text-pink-400" id="summary-service"></p>
-                <p class="text-lg text-gray-300" id="summary-datetime"></p>
-            </div>
-            <div id="step2-message" class="hidden p-3 rounded-lg mb-4 text-sm"></div>
-            <form id="confirm-form">
-                <div class="mb-4">
-                    <label for="client-name" class="block text-sm font-medium text-gray-300">O seu nome</label>
-                    <input type="text" id="client-name" class="mt-1 w-full p-3 bg-gray-700 border border-gray-600 rounded-md" required>
+        <!-- Painel Administrativo -->
+        <div id="admin-panel" class="flex h-screen bg-gray-900 text-gray-100">
+            <!-- Sidebar -->
+            <aside class="w-64 flex-shrink-0 bg-gray-800 p-4 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center gap-3 mb-8"><div class="w-10 h-10 bg-pink-500 rounded-full flex items-center justify-center font-bold text-xl">T</div><span class="text-xl font-semibold">Painel Admin</span></div>
+                    <nav class="space-y-2">
+                        <a href="#/admin/appointments" id="nav-appointments" class="sidebar-link flex items-center gap-3 px-4 py-2 rounded-lg"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd" /></svg><span>Agendamentos</span></a>
+                        <a href="#/admin/services" id="nav-services" class="sidebar-link flex items-center gap-3 px-4 py-2 rounded-lg"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z" /></svg><span>Serviços</span></a>
+                        <a href="#/admin/hours" id="nav-hours" class="sidebar-link flex items-center gap-3 px-4 py-2 rounded-lg"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.414-1.414L11 10.586V6z" clip-rule="evenodd" /></svg><span>Horários</span></a>
+                    </nav>
                 </div>
-                <div class="mb-4">
-                    <label for="client-phone" class="block text-sm font-medium text-gray-300">O seu telefone</label>
-                    <input type="tel" id="client-phone" class="mt-1 w-full p-3 bg-gray-700 border border-gray-600 rounded-md" required>
+                <div class="border-t border-gray-700 pt-4 space-y-2">
+                    <a href="#" id="go-to-site" class="sidebar-link flex items-center gap-3 px-4 py-2 rounded-lg"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z" /><path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" /></svg><span>Ver Site Principal</span></a>
+                    <a href="#" id="logout-button" class="sidebar-link flex items-center gap-3 px-4 py-2 rounded-lg"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd" /></svg><span>Sair</span></a>
                 </div>
-                 <div class="flex gap-4 mt-8">
-                    <button type="button" id="back-to-step1-btn" class="w-1/2 bg-gray-600 text-gray-200 py-3 rounded-lg hover:bg-gray-500 transition">Voltar</button>
-                    <button type="submit" id="finalize-schedule-btn" class="w-1/2 bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-500 transition disabled:opacity-50">Finalizar Agendamento</button>
+            </aside>
+            <main id="main-content" class="flex-1 p-6 lg:p-8 overflow-y-auto"></main>
+        </div>
+    </div>
+    
+    <!-- MODAL DE AGENDAMENTO (CLIENTE) -->
+    <div id="booking-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-hidden">
+        <div id="modal-backdrop" class="fixed inset-0 bg-black/60 backdrop-blur-sm modal-backdrop"></div>
+        <div class="relative bg-gray-800/80 backdrop-blur-xl border border-gray-700 rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col modal-content">
+            <div class="flex items-center justify-between p-5 border-b border-gray-700 flex-shrink-0">
+                <h3 id="booking-modal-title" class="text-xl font-semibold text-white"></h3>
+                <button id="close-modal-button" type="button" class="text-gray-400 bg-transparent hover:bg-gray-600 hover:text-white rounded-lg text-sm p-1.5 ml-auto inline-flex items-center" aria-label="Fechar modal"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg></button>
+            </div>
+            <div id="booking-modal-body" class="p-6 space-y-6 overflow-y-auto"></div>
+            <div id="booking-modal-footer" class="flex items-center justify-between p-6 border-t border-gray-700 rounded-b flex-shrink-0">
+                <button id="back-button" class="text-white bg-gray-600 hover:bg-gray-700 font-medium rounded-lg text-sm px-5 py-2.5 text-center transition-all">Voltar</button>
+                <button id="next-button" class="text-white bg-pink-600 hover:bg-pink-700 focus:ring-4 focus:outline-none focus:ring-pink-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center disabled:bg-gray-600 disabled:cursor-not-allowed transition-all">Avançar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE CONFIRMAÇÃO/ALERTA (ADMIN) -->
+    <div id="admin-confirm-modal" class="fixed inset-0 z-[60] flex items-center justify-center p-4 modal-hidden">
+        <div class="fixed inset-0 bg-black/60 backdrop-blur-sm modal-backdrop"></div>
+        <div class="relative bg-gray-800 border border-gray-700 rounded-2xl shadow-2xl w-full max-w-md flex flex-col modal-content">
+            <div class="p-6 text-center">
+                <div id="admin-confirm-icon" class="w-12 h-12 rounded-full mx-auto flex items-center justify-center mb-4">
+                    <!-- Icon will be injected here -->
                 </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Admin Modals -->
-    <div id="caixa-details-modal" class="fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
-        <div class="bg-[#1f2937] w-full max-w-lg p-6 rounded-xl shadow-lg border border-gray-700">
-            <h3 id="caixa-modal-title" class="text-xl font-bold mb-4 text-pink-400"></h3>
-            <div id="caixa-modal-content" class="max-h-96 overflow-y-auto divide-y divide-gray-700">
+                <h3 id="admin-confirm-title" class="text-lg font-semibold text-white mb-2"></h3>
+                <p id="admin-confirm-text" class="text-sm text-gray-400"></p>
             </div>
-            <div class="text-right font-black text-xl mt-4 text-green-400" id="caixa-modal-total"></div>
-            <button data-modal="caixa" class="close-modal-btn mt-6 w-full bg-pink-500 text-white py-2 rounded-lg font-bold">Fechar</button>
-        </div>
-    </div>
-
-    <div id="hourly-management-modal" class="fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
-        <div class="bg-[#1f2937] w-full max-w-md p-8 rounded-2xl shadow-2xl border border-gray-700">
-            <h2 id="hourly-modal-title" class="text-2xl font-bold mb-6 text-center text-pink-400 gold-shadow">Gerir Horários</h2>
-            <div id="hourly-modal-grid" class="max-h-64 overflow-y-auto grid grid-cols-4 gap-2 pr-2">
-                <!-- Hour slots will be rendered here by JS -->
-            </div>
-            <div class="flex gap-4 mt-8">
-                <button id="close-hourly-modal-btn" class="w-1/2 bg-gray-600 text-gray-200 py-3 rounded-lg hover:bg-gray-500 transition">Cancelar</button>
-                <button id="save-hourly-changes-btn" class="w-1/2 bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-500 transition">Salvar Alterações</button>
+            <div id="admin-confirm-footer" class="flex items-center justify-center gap-4 p-4 border-t border-gray-700 bg-gray-900/50 rounded-b-2xl">
+                <button id="admin-confirm-cancel" class="flex-1 text-white bg-gray-600 hover:bg-gray-700 font-medium rounded-lg text-sm px-5 py-2.5 text-center transition-all">Cancelar</button>
+                <button id="admin-confirm-ok" class="flex-1 text-white bg-pink-600 hover:bg-pink-700 font-medium rounded-lg text-sm px-5 py-2.5 text-center transition-all">Confirmar</button>
             </div>
         </div>
     </div>
 
-    
-    <script type="module" id="app-logic">
-    // =================================================================================
-    // DOM ELEMENTS CACHE & GLOBAL VARIABLES
-    // =================================================================================
-    const views = {
-        client: document.getElementById('client-view'),
-        adminLogin: document.getElementById('admin-login-view'),
-        adminPanel: document.getElementById('admin-panel-view'),
-    };
+    <!-- TOAST DE NOTIFICAÇÃO (ADMIN) -->
+    <div id="toast-notification" class="w-full max-w-xs p-4 text-gray-200 bg-gray-800 border border-gray-700 rounded-lg shadow-lg">
+        <div class="flex items-center">
+            <div id="toast-icon" class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 rounded-lg">
+                <!-- Icon will be injected here -->
+            </div>
+            <div id="toast-message" class="ml-3 text-sm font-normal"></div>
+        </div>
+    </div>
 
-    const modals = {
-        step1: document.getElementById('schedule-modal-step1'),
-        step2: document.getElementById('schedule-modal-step2'),
-        caixa: document.getElementById('caixa-details-modal'),
-        hourly: document.getElementById('hourly-management-modal'),
-    };
-    
-    let servicesCache = [];
-    let currentAppointment = {
-        service: null,
-        date: null,
-        time: null
-    };
-    let currentDate = new Date();
-    
-    // =================================================================================
-    // UTILITY FUNCTIONS
-    // =================================================================================
-    
-    const showView = (viewId) => {
-        Object.values(views).forEach(view => view.classList.add('hidden'));
-        views[viewId].classList.remove('hidden');
-    };
 
-    const toggleModal = (modalId, show = true) => {
-        const modal = modals[modalId];
-        if(!modal) return; // Guard clause
-        if (show) {
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-        } else {
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
-        }
-    };
-    
-    const showMessage = (elementId, message, type = 'error') => {
-        const el = document.getElementById(elementId);
-        el.textContent = message;
-        const colors = type === 'error' 
-            ? 'bg-red-900 text-red-200 border border-red-700' 
-            : 'bg-green-900 text-green-200 border border-green-700';
-        el.className = `p-3 rounded-lg mb-4 text-sm ${colors}`;
-        el.classList.remove('hidden');
-    };
-    
-    const hideMessage = (elementId) => {
-        document.getElementById(elementId).classList.add('hidden');
-    };
-    
-    const formatDate = (dateString, options = { weekday: 'long', day: '2-digit', month: 'long' }) => {
-        const date = new Date(dateString + 'T00:00:00');
-        const formatted = new Intl.DateTimeFormat('pt-BR', options).format(date);
-        return formatted.charAt(0).toUpperCase() + formatted.slice(1);
-    };
-    
-    const formatTime = (timeString) => timeString.substring(0, 5);
-    
-    const formatCurrency = (value) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value || 0);
-
-    const toggleButtonLoading = (btn, isLoading, originalText) => {
-        btn.disabled = isLoading;
-        if (isLoading) {
-            btn.textContent = 'Aguarde...';
-        } else {
-            btn.textContent = originalText;
-        }
-    };
-    
-    // =================================================================================
-    // CLIENT VIEW & SCHEDULING LOGIC
-    // =================================================================================
-    
-    const clientViewLogic = () => {
-        const serviceSelect = document.getElementById('service-select');
-        const dateSelect = document.getElementById('date-select');
-        const timeSelect = document.getElementById('time-select');
-
-        document.getElementById('open-schedule-modal-btn').addEventListener('click', () => {
-            toggleModal('step1');
-            loadServicesForClient();
-        });
-
-        document.getElementById('go-to-admin-login-btn').addEventListener('click', () => showView('adminLogin'));
-
-        document.querySelectorAll('.close-modal-btn').forEach(btn => {
-            btn.addEventListener('click', () => toggleModal(btn.dataset.modal, false));
-        });
-
-        document.getElementById('back-to-step1-btn').addEventListener('click', () => {
-            toggleModal('step2', false);
-            toggleModal('step1', true);
-        });
+    <script>
+        // --- CONFIGURAÇÃO GLOBAL ---
+        const SUPABASE_URL = 'https://ithaezbnrquukbgdurvn.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml0aGFlemJucnF1dWtiZ2R1cnZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTEzODIwNTMsImV4cCI6MjA2Njk1ODA1M30.CaIbMFaZag0IFPbaZfSdG4tw5KVsbnN5XPIGvzh1Q38';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
-        dateSelect.min = new Date().toISOString().split('T')[0];
+        // Substitua pelos seus dados
+        const YOUR_WHATSAPP_NUMBER = '5511999998888'; 
+        const YOUR_INSTAGRAM_USER = 'seu_usuario_instagram';
+
+        // --- FUNÇÕES UTILITÁRIAS GLOBAIS ---
         
-        const loadServicesForClient = async () => {
-            try {
-                const { data, error } = await window.supabase.from('services').select('*').order('name');
-                if (error) throw error;
-                servicesCache = data;
-                serviceSelect.innerHTML = '<option value="">Selecione um serviço</option>';
-                data.forEach(service => {
-                    serviceSelect.innerHTML += `<option value="${service.id}">${service.name} (${formatCurrency(service.price)})</option>`;
-                });
-            } catch (error) {
-                console.error('Erro ao carregar serviços:', error);
-                serviceSelect.innerHTML = '<option>Erro ao carregar</option>';
+        /**
+         * Cria o HTML para um ícone de loader (spinner).
+         * @returns {string} O HTML do SVG do loader.
+         */
+        const createLoaderHTML = (size = 'h-8 w-8') => `<div class="text-center py-10"><svg class="animate-spin ${size} text-pink-400 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg></div>`;
+
+        // --- ROTEADOR PRINCIPAL ---
+        function handleRouting() {
+            const hash = window.location.hash;
+            const clientView = document.getElementById('client-view');
+            const adminView = document.getElementById('admin-view');
+
+            if (hash.startsWith('#/admin')) {
+                clientView.style.display = 'none';
+                adminView.style.display = 'block';
+                initAdmin();
+            } else {
+                adminView.style.display = 'none';
+                clientView.style.display = 'block';
+                initClient();
             }
         };
-        
-        const loadAvailableTimes = async () => {
-            const serviceId = serviceSelect.value;
-            const selectedDate = dateSelect.value;
-            
-            if (!serviceId || !selectedDate) {
-                timeSelect.innerHTML = '<option>Selecione o serviço e a data</option>';
-                timeSelect.disabled = true;
-                return;
+
+        // =================================================================
+        // =================== LÓGICA DA PÁGINA DO CLIENTE =================
+        // =================================================================
+        function initClient() {
+            const openModalBtn = document.getElementById('open-booking-modal');
+            const whatsappLink = document.getElementById('whatsapp-link');
+            const instagramLink = document.getElementById('instagram-link');
+            if (openModalBtn.dataset.initialized) return; 
+            openModalBtn.dataset.initialized = 'true';
+
+            whatsappLink.href = `https://wa.me/${YOUR_WHATSAPP_NUMBER}`;
+            instagramLink.href = `https://instagram.com/${YOUR_INSTAGRAM_USER}`;
+
+            const bookingModal = document.getElementById('booking-modal');
+            const closeModalBtn = document.getElementById('close-modal-button');
+            const modalBackdrop = document.getElementById('modal-backdrop');
+            const modalBody = document.getElementById('booking-modal-body');
+            const modalTitle = document.getElementById('booking-modal-title');
+            const backBtn = document.getElementById('back-button');
+            const nextBtn = document.getElementById('next-button');
+
+            let currentStep = 1;
+            let appointment = {};
+            let allServices = [];
+
+            const openModal = () => {
+                resetState();
+                renderStep();
+                bookingModal.classList.remove('modal-hidden');
+            };
+            const closeModal = () => bookingModal.classList.add('modal-hidden');
+
+            const resetState = () => {
+                currentStep = 1;
+                appointment = { service: null, date: null, time: null, client: { name: '', phone: '' } };
+            };
+
+            const changeStep = (direction) => { currentStep += direction; renderStep(); };
+            const handleNextClick = () => {
+                if (nextBtn.disabled) return;
+                if (currentStep === 3) handleFinalConfirmation(); else changeStep(1);
+            };
+            const handleBackClick = () => changeStep(-1);
+
+            const renderStep = () => {
+                updateFooter();
+                modalBody.innerHTML = createLoaderHTML();
+                setTimeout(() => {
+                    switch(currentStep) {
+                        case 1: renderServicesStep(); break;
+                        case 2: renderDateTimeStep(); break;
+                        case 3: renderDetailsStep(); break;
+                        case 4: renderConfirmationStep(); break;
+                    }
+                }, 50);
+            };
+
+            const updateFooter = () => {
+                backBtn.classList.toggle('hidden', currentStep === 1 || currentStep === 4);
+                nextBtn.classList.toggle('hidden', currentStep === 4);
+                document.getElementById('booking-modal-footer').classList.toggle('hidden', currentStep === 4);
+
+                if (currentStep === 1) { modalTitle.innerText = '1. Escolha o Serviço'; nextBtn.disabled = !appointment.service; }
+                else if (currentStep === 2) { modalTitle.innerText = '2. Escolha a Data e Hora'; nextBtn.disabled = !appointment.time; }
+                else if (currentStep === 3) {
+                    modalTitle.innerText = '3. Seus Dados';
+                    nextBtn.textContent = 'Confirmar Agendamento';
+                    nextBtn.disabled = !(appointment.client.name && appointment.client.phone.length > 10);
+                }
+            };
+
+            async function renderServicesStep() {
+                try {
+                    const { data, error } = await supabase.from('services').select('*').order('name');
+                    if (error) throw error;
+                    allServices = data;
+
+                    if (allServices.length === 0) {
+                        modalBody.innerHTML = `<p class="text-gray-400 text-center">Nenhum serviço cadastrado no momento.</p>`;
+                        return;
+                    }
+                    const optionsHTML = allServices.map(service => `<option value="${service.id}" ${appointment.service && appointment.service.id === service.id ? 'selected' : ''}>${service.name}</option>`).join('');
+                    modalBody.innerHTML = `<div class="space-y-4"><label for="service-select" class="block mb-2 text-sm font-medium text-gray-300 text-left">Serviços Disponíveis</label><select id="service-select" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-pink-500 focus:border-pink-500 block w-full p-2.5"><option value="" disabled ${!appointment.service ? 'selected' : ''}>Selecione um serviço...</option>${optionsHTML}</select><div id="service-details" class="mt-4 p-4 bg-gray-900/50 rounded-lg text-left transition-all duration-300 ${!appointment.service ? 'hidden' : ''}"></div></div>`;
+                    
+                    const selectElement = document.getElementById('service-select');
+                    const detailsContainer = document.getElementById('service-details');
+
+                    const updateServiceDetails = () => {
+                        if (appointment.service) {
+                            detailsContainer.innerHTML = `<h4 class="font-bold text-white">${appointment.service.name}</h4><p class="text-gray-400 text-sm">${appointment.service.description || 'Sem descrição.'}</p><div class="flex justify-between mt-2 text-sm"><span>Duração: <strong>${appointment.service.duration_minutes} min</strong></span><span>Preço: <strong>R$ ${Number(appointment.service.price).toFixed(2).replace('.', ',')}</strong></span></div>`;
+                            detailsContainer.classList.remove('hidden');
+                        } else {
+                            detailsContainer.classList.add('hidden');
+                        }
+                    };
+                    updateServiceDetails();
+                    selectElement.addEventListener('change', (e) => {
+                        const serviceId = e.target.value;
+                        appointment.service = serviceId ? allServices.find(s => s.id == serviceId) : null;
+                        nextBtn.disabled = !appointment.service;
+                        updateServiceDetails();
+                    });
+                } catch (error) {
+                    console.error('Erro ao buscar serviços:', error);
+                    modalBody.innerHTML = `<p class="text-red-400 text-center">Não foi possível carregar os serviços.</p>`;
+                }
+            }
+
+            function renderDateTimeStep() {
+                modalBody.innerHTML = `
+                    <div class="space-y-6">
+                        <div>
+                            <h5 class="font-semibold text-lg text-white mb-3 text-left">Escolha um dia</h5>
+                            <div id="date-selector" class="date-selector"></div>
+                        </div>
+                        <div id="time-slots-container" class="hidden">
+                            <h5 class="font-semibold text-lg text-white mb-3 text-left">Escolha um horário</h5>
+                            <div id="time-slots-grid" class="grid grid-cols-3 sm:grid-cols-4 gap-2"></div>
+                        </div>
+                    </div>`;
+                renderDateSelector();
+            }
+
+            function renderDateSelector() {
+                const dateSelector = document.getElementById('date-selector');
+                if (!dateSelector) return;
+                dateSelector.innerHTML = '';
+                const today = new Date();
+                
+                for (let i = 0; i < 15; i++) {
+                    const date = new Date();
+                    date.setDate(today.getDate() + i);
+
+                    const dayBox = document.createElement('div');
+                    dayBox.className = 'date-box flex flex-col items-center justify-center';
+                    dayBox.dataset.date = date.toISOString();
+
+                    const dayOfWeek = date.toLocaleDateString('pt-BR', { weekday: 'short' }).slice(0, 3);
+                    const dayOfMonth = date.getDate();
+
+                    dayBox.innerHTML = `<span class="text-xs uppercase">${dayOfWeek}</span><span class="text-2xl font-bold">${dayOfMonth}</span>`;
+
+                    if (appointment.date && date.toDateString() === appointment.date.toDateString()) {
+                        dayBox.classList.add('selected');
+                        loadAvailableSlots(date);
+                    }
+
+                    dayBox.addEventListener('click', () => {
+                        appointment.date = new Date(dayBox.dataset.date);
+                        appointment.time = null;
+                        nextBtn.disabled = true;
+                        
+                        document.querySelectorAll('.date-box').forEach(box => box.classList.remove('selected'));
+                        dayBox.classList.add('selected');
+                        
+                        loadAvailableSlots(appointment.date);
+                    });
+                    dateSelector.appendChild(dayBox);
+                }
             }
             
-            timeSelect.innerHTML = '<option>A verificar horários...</option>';
-            timeSelect.disabled = true;
-            
-            const selectedService = servicesCache.find(s => s.id == serviceId);
-            if (!selectedService) return;
-            
-            const slotsNeeded = Math.ceil(selectedService.duration_minutes / 60);
-            
-            try {
-                const { data: availableSlots, error } = await window.supabase
-                    .from('slots')
-                    .select('time')
-                    .eq('date', selectedDate)
-                    .eq('status', 'available')
-                    .order('time');
-                if (error) throw error;
+            async function loadAvailableSlots(date) {
+                const timeSlotsContainer = document.getElementById('time-slots-container');
+                const timeSlotsGrid = document.getElementById('time-slots-grid');
+                timeSlotsContainer.classList.remove('hidden');
+                timeSlotsGrid.innerHTML = createLoaderHTML('h-6 w-6');
                 
-                if (!availableSlots || availableSlots.length === 0) {
-                     timeSelect.innerHTML = '<option>Nenhum horário disponível</option>';
-                     return;
+                const dateString = date.toISOString().slice(0, 10);
+                try {
+                    const [appRes, blockedRes, openDaysRes] = await Promise.all([
+                        supabase.from('appointments').select('start_time, end_time').gte('start_time', `${dateString}T00:00:00Z`).lt('start_time', `${dateString}T23:59:59Z`).in('status', ['pending', 'confirmed']),
+                        supabase.from('blocked_slots').select('slot_time').gte('slot_time', `${dateString}T00:00:00Z`).lt('slot_time', `${dateString}T23:59:59Z`),
+                        supabase.from('open_days').select('open_date').eq('open_date', dateString)
+                    ]);
+                    if (appRes.error) throw appRes.error;
+                    if (blockedRes.error) throw blockedRes.error;
+                    if (openDaysRes.error) throw openDaysRes.error;
+                    
+                    const slots = calculateAvailableSlots(date, appointment.service.duration_minutes, appRes.data, blockedRes.data, openDaysRes.data);
+                    renderTimeSlots(slots);
+                } catch (error) {
+                    console.error("Erro ao calcular horários:", error);
+                    timeSlotsGrid.innerHTML = '<p class="col-span-full text-red-400">Erro ao buscar horários.</p>';
                 }
-                
-                const availableTimes = availableSlots.map(s => s.time);
-                const validStartTimes = [];
-                
-                for (let i = 0; i <= availableTimes.length - slotsNeeded; i++) {
-                    let isSequenceValid = true;
-                    for (let j = 1; j < slotsNeeded; j++) {
-                        const currentTime = new Date(`${selectedDate}T${availableTimes[i+j-1]}`);
-                        const nextTime = new Date(`${selectedDate}T${availableTimes[i+j]}`);
-                        if ((nextTime - currentTime) / (1000 * 60) !== 60) {
-                            isSequenceValid = false;
+            }
+
+            // =================================================================
+            // =================== CORREÇÃO DA LÓGICA DE SLOT ==================
+            // =================================================================
+            function calculateAvailableSlots(date, serviceDuration, appointments, blockedSlots, openDays) {
+                const dateString = date.toISOString().slice(0, 10);
+                const isDayOpen = openDays.some(d => d.open_date === dateString);
+
+                if (!isDayOpen) return [];
+
+                const availableSlots = [];
+                const dayStart = new Date(date);
+                dayStart.setHours(7, 0, 0, 0); 
+
+                const dayEnd = new Date(date);
+                dayEnd.setHours(22, 0, 0, 0);
+
+                // MODIFICAÇÃO: Gera e verifica apenas slots de hora em hora para a visão do cliente.
+                for (let hour = 7; hour < 22; hour++) {
+                    const potentialSlotStart = new Date(date);
+                    potentialSlotStart.setHours(hour, 0, 0, 0);
+
+                    const potentialSlotEnd = new Date(potentialSlotStart.getTime() + serviceDuration * 60000);
+
+                    // Garante que o serviço termine antes do fim do expediente.
+                    if (potentialSlotEnd > dayEnd) {
+                        continue;
+                    }
+
+                    let isColliding = false;
+
+                    // Verifica colisão com agendamentos existentes.
+                    // A lógica de colisão é: (InícioA < FimB) E (FimA > InícioB)
+                    for (const app of appointments) {
+                        const appStart = new Date(app.start_time);
+                        const appEnd = new Date(app.end_time);
+                        if (potentialSlotStart < appEnd && potentialSlotEnd > appStart) {
+                            isColliding = true;
+                            break; 
+                        }
+                    }
+
+                    if (isColliding) continue;
+
+                    // Verifica colisão com horários bloqueados manualmente pelo admin.
+                    for (const bs of blockedSlots) {
+                        const blockedStart = new Date(bs.slot_time);
+                        const blockedEnd = new Date(blockedStart.getTime() + 60 * 60000); // Bloqueio do admin dura 1 hora.
+                        if (potentialSlotStart < blockedEnd && potentialSlotEnd > blockedStart) {
+                            isColliding = true;
                             break;
                         }
                     }
-                    if (isSequenceValid) {
-                        validStartTimes.push(availableTimes[i]);
+                    
+                    if (!isColliding) {
+                        availableSlots.push(potentialSlotStart);
                     }
                 }
-                
-                if (validStartTimes.length > 0) {
-                    timeSelect.innerHTML = '<option value="">Selecione um horário</option>';
-                    validStartTimes.forEach(time => {
-                        timeSelect.innerHTML += `<option value="${time}">${formatTime(time)}</option>`;
-                    });
-                    timeSelect.disabled = false;
-                } else {
-                    timeSelect.innerHTML = '<option>Não há horários para este serviço.</option>';
-                }
-            } catch (error) {
-                console.error('Erro ao carregar horários:', error);
-                timeSelect.innerHTML = '<option>Erro ao verificar horários</option>';
-            }
-        };
-        
-        serviceSelect.addEventListener('change', loadAvailableTimes);
-        dateSelect.addEventListener('change', loadAvailableTimes);
-        
-        document.getElementById('continue-to-step2-btn').addEventListener('click', () => {
-            hideMessage('step1-message');
-            const serviceId = serviceSelect.value;
-            const date = dateSelect.value;
-            const time = timeSelect.value;
-            
-            if (!serviceId || !date || !time) {
-                showMessage('step1-message', 'Por favor, selecione serviço, data e horário.');
-                return;
+
+                return availableSlots;
             }
             
-            const service = servicesCache.find(s => s.id == serviceId);
-            currentAppointment = { service, date, time };
-            
-            document.getElementById('summary-service').textContent = service.name;
-            document.getElementById('summary-datetime').textContent = `${formatDate(date, {day: '2-digit', month: 'long'})} às ${formatTime(time)}`;
-            
-            toggleModal('step1', false);
-            toggleModal('step2', true);
-        });
-        
-        document.getElementById('confirm-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            hideMessage('step2-message');
-            const name = document.getElementById('client-name').value.trim();
-            const phone = document.getElementById('client-phone').value.trim();
-            
-            if (!name || !phone) {
-                showMessage('step2-message', 'Nome e telefone são obrigatórios.');
-                return;
-            }
-            
-            const btn = document.getElementById('finalize-schedule-btn');
-            toggleButtonLoading(btn, true, 'Finalizar Agendamento');
-            
-            const { service, date, time } = currentAppointment;
-            
-            try {
-                const { data: appointment, error: appointError } = await window.supabase.from('appointments').insert({
-                    service_name: service.name,
-                    appointment_date: date,
-                    appointment_time: time,
-                    client_name: name,
-                    client_phone: phone,
-                    status: 'Agendado',
-                    service_id: service.id,
-                    price: service.price,
-                }).select().single();
-
-                if (appointError) throw appointError;
-                
-                const slotsNeeded = Math.ceil(service.duration_minutes / 60);
-                const startTime = new Date(`${date}T${time}`);
-                const slotsToUpdate = Array.from({ length: slotsNeeded }, (_, i) => {
-                    const slotTime = new Date(startTime.getTime() + i * 60 * 60000);
-                    return slotTime.toTimeString().split(' ')[0];
-                });
-                
-                const { error: slotError } = await window.supabase
-                    .from('slots')
-                    .update({ status: 'occupied' })
-                    .eq('date', date)
-                    .in('time', slotsToUpdate);
-                if (slotError) throw slotError;
-                
-                const message = `Olá, sou ${name} e gostaria de confirmar o meu agendamento para o serviço de ${service.name} no dia ${formatDate(date, {day: '2-digit', month: 'long'})} às ${formatTime(time)}. O meu telefone é ${phone}. Obrigado!`;
-                const whatsappUrl = `https://api.whatsapp.com/send?phone=5531971722989&text=${encodeURIComponent(message)}`;
-                
-                e.target.reset();
-                toggleModal('step2', false);
-                window.open(whatsappUrl, '_blank');
-                
-            } catch (error) {
-                console.error('Erro ao finalizar agendamento:', error);
-                showMessage('step2-message', `Ocorreu um erro: ${error.message}. Tente novamente.`);
-            } finally {
-                toggleButtonLoading(btn, false, 'Finalizar Agendamento');
-            }
-        });
-        
-        // --- Sparkle Animation ---
-        const sparkleContainer = document.querySelector('.sparkle-container');
-        if (sparkleContainer) {
-            for (let i = 0; i < 30; i++) {
-                const sparkle = document.createElement('div');
-                sparkle.classList.add('sparkle');
-                const size = Math.random() * 3 + 1;
-                sparkle.style.width = `${size}px`;
-                sparkle.style.height = `${size}px`;
-                sparkle.style.left = `${Math.random() * 100}%`;
-                sparkle.style.animationDuration = `${Math.random() * 10 + 10}s`;
-                sparkle.style.animationDelay = `${Math.random() * 10}s`;
-                if(Math.random() > 0.5) {
-                    sparkle.style.backgroundColor = 'var(--gold-main)';
-                    sparkle.style.boxShadow = '0 0 5px var(--gold-main), 0 0 10px var(--gold-main)';
-                }
-                sparkleContainer.appendChild(sparkle);
-            }
-        }
-    };
-    
-    // =================================================================================
-    // ADMIN PANEL LOGIC
-    // =================================================================================
-    
-    const adminPanelLogic = () => {
-        // --- Login & Logout ---
-        const loginForm = document.getElementById('login-form');
-        loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            hideMessage('login-error-message');
-            const email = document.getElementById('email-login').value;
-            const password = document.getElementById('password-login').value;
-            const btn = document.getElementById('login-submit-btn');
-
-            toggleButtonLoading(btn, true, 'Entrar');
-
-            try {
-                const { data, error } = await window.supabase.auth.signInWithPassword({ email, password });
-                if (error) throw error;
-                
-                showView('adminPanel');
-                loginForm.reset();
-                loadAdminDashboard();
-            } catch (error) {
-                showMessage('login-error-message', 'Falha na autenticação: ' + error.message);
-            } finally {
-                toggleButtonLoading(btn, false, 'Entrar');
-            }
-        });
-
-        document.getElementById('back-to-client-view-btn').addEventListener('click', () => showView('client'));
-        
-        document.getElementById('logout-btn').addEventListener('click', async () => {
-            await window.supabase.auth.signOut();
-            showView('client');
-        });
-
-        // --- Dashboard & Tabs ---
-        const loadAdminDashboard = () => {
-            showTodaysAppointmentsAlert();
-            switchTab('agendamentos');
-        };
-
-        const showTodaysAppointmentsAlert = async () => {
-            const alertBox = document.getElementById('todays-appointments-alert');
-            const listEl = document.getElementById('todays-appointments-list');
-            const today = new Date().toISOString().split('T')[0];
-            
-            try {
-                const { data, error } = await window.supabase
-                    .from('appointments')
-                    .select('service_name, appointment_time, client_name')
-                    .eq('appointment_date', today)
-                    .eq('status', 'Agendado')
-                    .order('appointment_time');
-                if (error) throw error;
-
-                if (!data || data.length === 0) {
-                    alertBox.classList.add('hidden');
-                } else {
-                    listEl.innerHTML = data.map(app => 
-                        `<li><strong>${formatTime(app.appointment_time)}</strong> - ${app.service_name} (${app.client_name})</li>`
-                    ).join('');
-                     alertBox.classList.remove('hidden');
-                }
-            } catch (error) {
-                console.error("Erro ao buscar agendamentos do dia:", error);
-                listEl.innerHTML = '<li>Erro ao carregar agendamentos.</li>';
-            }
-        };
-
-        document.getElementById('close-alert-btn').addEventListener('click', () => {
-            document.getElementById('todays-appointments-alert').classList.add('hidden');
-        });
-
-        const adminTabs = document.getElementById('admin-tabs');
-        adminTabs.addEventListener('click', (e) => {
-            if (e.target.matches('.admin-tab')) {
-                switchTab(e.target.dataset.tab);
-            }
-        });
-        
-        const switchTab = (tabName) => {
-            adminTabs.querySelectorAll('.admin-tab').forEach(tab => {
-                const isActive = tab.dataset.tab === tabName;
-                tab.classList.toggle('border-pink-500', isActive);
-                tab.classList.toggle('text-pink-400', isActive);
-                tab.classList.toggle('border-transparent', !isActive);
-                tab.classList.toggle('text-gray-500', !isActive);
-                tab.classList.toggle('hover:text-gray-200', !isActive);
-                tab.classList.toggle('hover:border-gray-500', !isActive);
-            });
-            
-            document.querySelectorAll('.admin-tab-content').forEach(content => content.classList.add('hidden'));
-            document.getElementById(`${tabName}-tab-content`).classList.remove('hidden');
-    
-            if (tabName === 'services') loadServicesForAdmin();
-            if (tabName === 'disponibilidade') renderCalendar();
-            if (tabName === 'agendamentos') loadAdminAgenda();
-            if (tabName === 'caixa') loadCaixa();
-        };
-
-        // --- Services Tab (CRUD) ---
-        const serviceForm = document.getElementById('service-form');
-        const serviceTableBody = document.getElementById('services-table-body');
-
-        const loadServicesForAdmin = async () => {
-            try {
-                const { data, error } = await window.supabase.from('services').select('*').order('name');
-                if (error) throw error;
-                servicesCache = data;
-                serviceTableBody.innerHTML = data.map(s => `
-                    <tr class="hover:bg-gray-700">
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-200">${s.name}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">${s.duration_minutes} min</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">${formatCurrency(s.price)}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                            <button data-id="${s.id}" class="edit-service-btn text-indigo-400 hover:text-indigo-300">Editar</button>
-                            <button data-id="${s.id}" class="delete-service-btn text-pink-500 hover:text-pink-400">Excluir</button>
-                        </td>
-                    </tr>
-                `).join('');
-            } catch (error) {
-                 console.error(error);
-                 serviceTableBody.innerHTML = `<tr><td colspan="4" class="text-center p-4 text-red-400">Erro ao carregar serviços.</td></tr>`;
-            }
-        };
-    
-        serviceForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const serviceData = {
-                name: document.getElementById('service-name').value,
-                duration_minutes: parseInt(document.getElementById('service-duration').value),
-                price: parseFloat(document.getElementById('service-price').value),
-            };
-            const id = document.getElementById('service-id').value;
-            
-            const promise = id 
-                ? window.supabase.from('services').update(serviceData).eq('id', id)
-                : window.supabase.from('services').insert(serviceData);
-
-            try {
-                const { error } = await promise;
-                if (error) throw error;
-                resetServiceForm();
-                loadServicesForAdmin();
-            } catch (error) {
-                console.error('Erro ao salvar serviço: ' + error.message);
-            }
-        });
-    
-        serviceTableBody.addEventListener('click', async (e) => {
-            const id = e.target.dataset.id;
-            if (e.target.classList.contains('edit-service-btn')) {
-                const service = servicesCache.find(s => s.id == id);
-                if (service) {
-                    document.getElementById('service-form-title').textContent = 'Editar Serviço';
-                    document.getElementById('service-id').value = service.id;
-                    document.getElementById('service-name').value = service.name;
-                    document.getElementById('service-duration').value = service.duration_minutes;
-                    document.getElementById('service-price').value = service.price;
-                    document.getElementById('cancel-edit-btn').classList.remove('hidden');
-                }
-            }
-            if (e.target.classList.contains('delete-service-btn')) {
-                try {
-                    const { error } = await window.supabase.from('services').delete().eq('id', id);
-                    if (error) throw error;
-                    loadServicesForAdmin();
-                } catch (error) {
-                    console.error('Erro ao excluir: ' + error.message);
-                }
-            }
-        });
-
-        document.getElementById('cancel-edit-btn').addEventListener('click', resetServiceForm);
-        
-        function resetServiceForm() {
-            document.getElementById('service-form-title').textContent = 'Adicionar Novo Serviço';
-            serviceForm.reset();
-            document.getElementById('service-id').value = '';
-            document.getElementById('cancel-edit-btn').classList.add('hidden');
-        }
-
-        // --- Appointments Tab ---
-        const appointmentsListContainer = document.getElementById('appointments-list-container');
-        
-        const loadAdminAgenda = async () => {
-            try {
-                const { data, error } = await window.supabase
-                    .from('appointments')
-                    .select('*, services(duration_minutes)')
-                    .order('appointment_date', { ascending: false })
-                    .order('appointment_time');
-                if (error) throw error;
-
-                const today = new Date().toISOString().split('T')[0];
-
-                const groupedAppointments = data.reduce((acc, app) => {
-                    const date = app.appointment_date;
-                    if (!acc[date]) acc[date] = [];
-                    acc[date].push(app);
-                    return acc;
-                }, {});
-
-                const sortedDates = Object.keys(groupedAppointments).sort((a, b) => new Date(b) - new Date(a));
-
-                let html = '';
-                if (sortedDates.length === 0) {
-                    html = `<div class="text-center p-8 text-gray-500">Nenhum agendamento encontrado.</div>`;
-                } else {
-                    sortedDates.forEach(date => {
-                        html += `
-                            <div class="date-group">
-                                <h4 class="text-lg font-bold text-gray-300 mb-3 sticky top-[68px] bg-[#111827] py-2 z-10">
-                                    ${formatDate(date)} 
-                                    ${date === today ? '<span class="ml-2 px-2 py-0.5 text-xs rounded-full bg-pink-500 text-white font-semibold">HOJE</span>' : ''}
-                                </h4>
-                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        `;
-
-                        groupedAppointments[date].forEach(app => {
-                            let statusClass = 'bg-blue-800 text-blue-200';
-                            if (app.status === 'Concluído') statusClass = 'bg-green-800 text-green-200';
-                            if (app.status === 'Cancelado') statusClass = 'bg-red-800 text-red-200';
-
-                            let cardClass = 'border-l-4 p-4 bg-[#1f2937] rounded-r-lg shadow-md';
-                            if (app.appointment_date < today) {
-                                cardClass += ' border-gray-600 opacity-70';
-                            } else if (app.appointment_date === today) {
-                                cardClass += ' border-pink-500';
-                            } else {
-                                cardClass += ' border-blue-500';
-                            }
-
-                            html += `
-                                <div class="${cardClass}">
-                                    <div class="flex justify-between items-start">
-                                        <div>
-                                            <p class="font-bold text-2xl text-gray-100">${formatTime(app.appointment_time)}</p>
-                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusClass}">${app.status}</span>
-                                        </div>
-                                        <p class="font-bold text-lg text-green-400">${formatCurrency(app.price)}</p>
-                                    </div>
-                                    <div class="mt-4">
-                                        <p class="font-bold text-gray-100">${app.client_name}</p>
-                                        <p class="text-sm text-gray-400">${app.service_name}</p>
-                                        <p class="text-sm text-gray-500 mt-1">${app.client_phone}</p>
-                                    </div>
-                                    ${app.status === 'Agendado' ? `
-                                    <div class="mt-4 pt-3 border-t border-gray-700 flex gap-2">
-                                        <button data-id="${app.id}" class="conclude-appointment-btn w-full text-sm bg-green-600 text-white py-1 px-3 rounded hover:bg-green-500 transition">Concluir</button>
-                                        <button data-id="${app.id}" class="cancel-appointment-btn w-full text-sm bg-red-600 text-white py-1 px-3 rounded hover:bg-red-500 transition">Cancelar</button>
-                                    </div>
-                                    ` : ''}
-                                </div>
-                            `;
-                        });
-
-                        html += `</div></div>`;
-                    });
-                }
-                appointmentsListContainer.innerHTML = html;
-
-            } catch (error) {
-                console.error(error);
-                appointmentsListContainer.innerHTML = `<div class="text-center p-4 text-red-400">Erro ao carregar agendamentos.</div>`;
-            }
-        };
-
-        appointmentsListContainer.addEventListener('click', async (e) => {
-            const button = e.target.closest('button');
-            if (!button) return;
-
-            const id = button.dataset.id;
-            let newStatus = '';
-            if (button.classList.contains('conclude-appointment-btn')) newStatus = 'Concluído';
-            if (button.classList.contains('cancel-appointment-btn')) newStatus = 'Cancelado';
-            
-            if (id && newStatus) {
-                try {
-                    const { error } = await window.supabase.from('appointments').update({ status: newStatus }).eq('id', id);
-                    if (error) throw error;
-                    if (newStatus === 'Cancelado') await freeUpSlotsForAppointment(id);
-                    loadAdminAgenda();
-                } catch (error) {
-                    console.error('Erro ao atualizar status: ' + error.message);
-                }
-            }
-        });
-        
-        async function freeUpSlotsForAppointment(appointmentId) {
-            try {
-                const { data: appData, error } = await window.supabase
-                    .from('appointments')
-                    .select('appointment_date, appointment_time, service_id, services(duration_minutes)')
-                    .eq('id', appointmentId)
-                    .single();
-        
-                if (error || !appData || !appData.services) throw error || new Error("Dados da consulta ou serviço não encontrados.");
-        
-                const slotsNeeded = Math.ceil(appData.services.duration_minutes / 60);
-                const startTime = new Date(`${appData.appointment_date}T${appData.appointment_time}`);
-                const slotsToFree = Array.from({ length: slotsNeeded }, (_, i) => {
-                    const slotTime = new Date(startTime.getTime() + i * 60 * 60000);
-                    return slotTime.toTimeString().split(' ')[0];
-                });
-                
-                const { error: updateError } = await window.supabase
-                    .from('slots')
-                    .update({ status: 'available' })
-                    .eq('date', appData.appointment_date)
-                    .in('time', slotsToFree);
-                if (updateError) throw updateError;
-            } catch(error) {
-                 console.error("Erro ao reabrir slots:", error);
-                 console.error("A consulta foi cancelada, mas ocorreu um erro ao reabrir os horários na agenda.");
-            }
-        }
-
-        document.getElementById('clean-cancelled-btn').addEventListener('click', async () => {
-             const { error } = await window.supabase
-                .from('appointments')
-                .delete()
-                .eq('status', 'Cancelado');
-
-            if(error){
-                console.error("Erro ao limpar cancelados:", error.message);
-            } else {
-                loadAdminAgenda();
-            }
-        });
-        
-        // --- Availability Tab (Calendar Logic) ---
-        const calendarContainer = document.getElementById('calendar-container');
-
-        const renderCalendar = async () => {
-            const year = currentDate.getFullYear();
-            const month = currentDate.getMonth();
-
-            const firstDayOfMonth = new Date(year, month, 1);
-            const lastDayOfMonth = new Date(year, month + 1, 0);
-            const firstDayOfWeek = firstDayOfMonth.getDay(); // 0-6 (Sun-Sat)
-            const daysInMonth = lastDayOfMonth.getDate();
-
-            const { data: monthSlots, error } = await window.supabase
-                .from('slots')
-                .select('date')
-                .eq('status', 'available')
-                .gte('date', `${year}-${(month + 1).toString().padStart(2, '0')}-01`)
-                .lte('date', `${year}-${(month + 1).toString().padStart(2, '0')}-${daysInMonth}`);
-            
-            if(error) {
-                console.error("Error fetching month slots:", error);
-                calendarContainer.innerHTML = `<p class="text-red-400">Erro ao carregar o calendário.</p>`;
-                return;
-            }
-
-            const availableDays = new Set(monthSlots.map(slot => slot.date));
-
-            const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
-            
-            let html = `
-                <div class="flex justify-between items-center mb-4">
-                    <button id="prev-month-btn" class="p-2 rounded-full hover:bg-gray-700 transition">&lt;</button>
-                    <h4 class="text-lg font-bold text-gray-200">${monthNames[month]} ${year}</h4>
-                    <button id="next-month-btn" class="p-2 rounded-full hover:bg-gray-700 transition">&gt;</button>
-                </div>
-                <div class="grid grid-cols-7 gap-2 text-center text-xs text-gray-400 mb-2">
-                    <div>Dom</div><div>Seg</div><div>Ter</div><div>Qua</div><div>Qui</div><div>Sex</div><div>Sáb</div>
-                </div>
-                <div class="grid grid-cols-7 gap-2">
-            `;
-
-            for (let i = 0; i < firstDayOfWeek; i++) {
-                html += `<div></div>`;
-            }
-
-            for (let day = 1; day <= daysInMonth; day++) {
-                const dateStr = `${year}-${(month + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
-                const isAvailable = availableDays.has(dateStr);
-                const dayStatusClass = isAvailable ? 'bg-green-800 text-green-200' : 'bg-red-800 text-red-300';
-                
-                html += `
-                    <div data-date="${dateStr}" class="calendar-day cursor-pointer aspect-square flex items-center justify-center rounded-lg ${dayStatusClass} transition hover:ring-2 hover:ring-pink-500">
-                        ${day}
-                    </div>
-                `;
-            }
-            html += `</div>`;
-            calendarContainer.innerHTML = html;
-
-            document.getElementById('prev-month-btn').addEventListener('click', () => {
-                currentDate.setMonth(currentDate.getMonth() - 1);
-                renderCalendar();
-            });
-            document.getElementById('next-month-btn').addEventListener('click', () => {
-                currentDate.setMonth(currentDate.getMonth() + 1);
-                renderCalendar();
-            });
-            calendarContainer.querySelectorAll('.calendar-day').forEach(day => {
-                day.addEventListener('click', () => handleDayClick(day.dataset.date));
-            });
-        };
-
-        const handleDayClick = async (dateStr) => {
-            const { data: existingSlots, error } = await window.supabase
-                .from('slots')
-                .select('time')
-                .eq('date', dateStr)
-                .eq('status', 'available');
-
-            if (error) {
-                console.error('Erro ao carregar horários do dia.');
-                return;
-            }
-
-            const availableTimes = new Set(existingSlots.map(s => s.time));
-            const hourlyGrid = document.getElementById('hourly-modal-grid');
-            let gridHtml = '';
-            
-            for(let hour = 6; hour <= 23; hour++) {
-                const timeStr = `${hour.toString().padStart(2, '0')}:00:00`;
-                const isActive = availableTimes.has(timeStr);
-                const activeClass = isActive ? 'bg-green-600 text-white' : 'bg-gray-600 text-gray-300';
-                gridHtml += `
-                    <button data-time="${timeStr}" class="hour-toggle p-3 rounded-lg ${activeClass} transition">
-                        ${hour.toString().padStart(2, '0')}:00
-                    </button>
-                `;
-            }
-            hourlyGrid.innerHTML = gridHtml;
-
-            document.getElementById('hourly-modal-title').textContent = `Gerir Horários - ${formatDate(dateStr, {day: '2-digit', month: '2-digit', year: 'numeric'})}`;
-            
-            hourlyGrid.querySelectorAll('.hour-toggle').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    btn.classList.toggle('bg-green-600');
-                    btn.classList.toggle('text-white');
-                    btn.classList.toggle('bg-gray-600');
-                    btn.classList.toggle('text-gray-300');
-                });
-            });
-
-            const saveBtn = document.getElementById('save-hourly-changes-btn');
-            const newSaveBtn = saveBtn.cloneNode(true);
-            saveBtn.parentNode.replaceChild(newSaveBtn, saveBtn);
-            newSaveBtn.addEventListener('click', () => handleHourlyModalSaveChanges(dateStr));
-            
-            toggleModal('hourly', true);
-        };
-
-        const handleHourlyModalSaveChanges = async (dateStr) => {
-            const grid = document.getElementById('hourly-modal-grid');
-            const selectedButtons = grid.querySelectorAll('.hour-toggle.bg-green-600');
-            const slotsToInsert = [];
-            selectedButtons.forEach(btn => {
-                slotsToInsert.push({
-                    date: dateStr,
-                    time: btn.dataset.time,
-                    status: 'available'
-                });
-            });
-
-            const { error: deleteError } = await window.supabase
-                .from('slots')
-                .delete()
-                .eq('date', dateStr)
-                .eq('status', 'available');
-
-            if (deleteError) {
-                console.error('Erro ao atualizar horários: ' + deleteError.message);
-                return;
-            }
-
-            if (slotsToInsert.length > 0) {
-                const { error: insertError } = await window.supabase
-                    .from('slots')
-                    .insert(slotsToInsert);
-                
-                if(insertError) {
-                    console.error('Erro ao salvar novos horários: ' + insertError.message);
+            function renderTimeSlots(slots) {
+                const timeSlotsGrid = document.getElementById('time-slots-grid');
+                if(!timeSlotsGrid) return;
+                timeSlotsGrid.innerHTML = '';
+                if (slots.length === 0) {
+                    timeSlotsGrid.innerHTML = '<p class="col-span-full text-center text-gray-400">Nenhum horário disponível para este dia.</p>';
                     return;
                 }
+                slots.forEach(slot => {
+                    const timeString = slot.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+                    const slotElement = document.createElement('button');
+                    slotElement.textContent = timeString;
+                    slotElement.dataset.time = slot.toISOString();
+                    slotElement.className = `time-slot available p-2 border ${appointment.time && slot.getTime() === appointment.time.getTime() ? 'selected' : 'border-gray-600'} rounded-md text-sm`;
+                    timeSlotsGrid.appendChild(slotElement);
+                });
+
+                timeSlotsGrid.onclick = (e) => {
+                    const slotElement = e.target.closest('.time-slot.available');
+                    if (!slotElement) return;
+                    appointment.time = new Date(slotElement.dataset.time);
+                    nextBtn.disabled = false;
+                    timeSlotsGrid.querySelectorAll('.time-slot').forEach(el => el.classList.remove('selected'));
+                    slotElement.classList.add('selected');
+                };
             }
 
-            toggleModal('hourly', false);
-            renderCalendar();
-        };
+            function renderDetailsStep() {
+                modalBody.innerHTML = `<div class="space-y-4"><div><label for="client-name" class="block mb-2 text-sm font-medium text-gray-300 text-left">Nome Completo</label><input type="text" id="client-name" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-pink-500 focus:border-pink-500 block w-full p-2.5" placeholder="Seu nome" required value="${appointment.client.name || ''}"></div><div><label for="client-phone" class="block mb-2 text-sm font-medium text-gray-300 text-left">Telefone (WhatsApp)</label><input type="tel" id="client-phone" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-pink-500 focus:border-pink-500 block w-full p-2.5" placeholder="(XX) XXXXX-XXXX" required value="${appointment.client.phone || ''}"></div></div>`;
+                const nameInput = document.getElementById('client-name'), phoneInput = document.getElementById('client-phone');
+                const validateDetails = () => {
+                    appointment.client.name = nameInput.value.trim();
+                    appointment.client.phone = phoneInput.value.trim();
+                    nextBtn.disabled = !(appointment.client.name && appointment.client.phone.length > 10);
+                };
+                nameInput.oninput = validateDetails; phoneInput.oninput = validateDetails;
+                validateDetails();
+            }
 
-        document.getElementById('close-hourly-modal-btn').addEventListener('click', () => toggleModal('hourly', false));
+            function renderConfirmationStep(isSuccess = true, message = '') {
+                modalTitle.innerText = isSuccess ? 'Agendamento Confirmado!' : 'Ocorreu um Erro';
+                if (isSuccess) {
+                    const startTime = new Date(appointment.date);
+                    startTime.setHours(appointment.time.getHours(), appointment.time.getMinutes());
+                    modalBody.innerHTML = `<div class="text-center py-8"><svg class="w-16 h-16 mx-auto text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg><h4 class="text-2xl font-bold text-white mt-4">Tudo Certo!</h4><div class="mt-4 text-gray-300 bg-gray-900/50 p-4 rounded-lg inline-block text-left"><p><strong>Serviço:</strong> ${appointment.service.name}</p><p><strong>Data:</strong> ${startTime.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })}</p><p><strong>Horário:</strong> ${startTime.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</p></div><p class="mt-4 text-sm text-gray-400">Uma mensagem de confirmação foi aberta no seu WhatsApp.</p></div>`;
+                } else {
+                     modalBody.innerHTML = `<div class="text-center py-8"><svg class="w-16 h-16 mx-auto text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg><h4 class="text-2xl font-bold text-white mt-4">Falha no Agendamento</h4><p class="mt-2 text-gray-300">${message}</p><p class="mt-4 text-sm text-gray-400">Por favor, tente novamente ou entre em contato.</p></div>`;
+                }
+            }
 
-        // --- Caixa Tab ---
-        const loadCaixa = async () => {
-            try {
-                const { data: completed, error } = await window.supabase
-                    .from('appointments')
-                    .select('price, appointment_date, service_name, client_name')
-                    .eq('status', 'Concluído');
-                if(error) throw error;
-        
-                const now = new Date();
-                const todayStr = now.toISOString().split('T')[0];
+            async function handleFinalConfirmation() {
+                if (!appointment.service || !appointment.date || !appointment.time || !appointment.client.name || !appointment.client.phone) {
+                    currentStep = 4; renderConfirmationStep(false, "Dados incompletos. Por favor, reinicie o processo."); updateFooter(); return;
+                }
+                nextBtn.innerHTML = createLoaderHTML('h-5 w-5');
+                nextBtn.disabled = true; backBtn.classList.add('hidden');
                 
-                const startOfWeek = new Date(now);
-                startOfWeek.setDate(now.getDate() - now.getDay() + (now.getDay() === 0 ? -6 : 1));
-                const startOfWeekStr = startOfWeek.toISOString().split('T')[0];
-                
-                const startOfMonthStr = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+                const startTime = new Date(appointment.date);
+                startTime.setHours(appointment.time.getHours(), appointment.time.getMinutes(), 0, 0);
+                const endTime = new Date(startTime.getTime() + appointment.service.duration_minutes * 60000);
 
-                const dayData = completed.filter(a => a.appointment_date === todayStr);
-                const weekData = completed.filter(a => a.appointment_date >= startOfWeekStr);
-                const monthData = completed.filter(a => a.appointment_date >= startOfMonthStr);
-        
-                updateCaixaCard('dia', dayData);
-                updateCaixaCard('semana', weekData);
-                updateCaixaCard('mes', monthData);
-            } catch(error) {
-                console.error("Erro ao carregar caixa:", error);
+                try {
+                    // **IMPORTANTE**: A segurança real deve vir das Policies (RLS) no Supabase.
+                    // Esta verificação no cliente é apenas uma conveniência para o usuário.
+                    const { data: conflictingAppointments, error: checkError } = await supabase
+                        .from('appointments')
+                        .select('id')
+                        .or(`and(start_time.lt.${endTime.toISOString()},end_time.gt.${startTime.toISOString()})`)
+                        .in('status', ['pending', 'confirmed']);
+
+                    if (checkError) throw new Error("Erro ao verificar horários. Tente novamente.");
+                    if (conflictingAppointments.length > 0) {
+                        throw new Error("Este horário já foi preenchido enquanto você agendava. Por favor, escolha outro.");
+                    }
+
+                    const { error: appError } = await supabase.from('appointments').insert({
+                        service_id: appointment.service.id,
+                        start_time: startTime.toISOString(),
+                        end_time: endTime.toISOString(),
+                        status: 'confirmed', // ou 'pending' se precisar de confirmação manual
+                        client_name: appointment.client.name,
+                        client_phone: appointment.client.phone
+                    });
+
+                    if (appError) throw appError;
+                    
+                    currentStep = 4;
+                    renderStep();
+                    sendWhatsAppMessage();
+                } catch (error) {
+                    console.error('Erro ao confirmar agendamento:', error);
+                    let errorMessage = error.message.includes("Este horário já foi preenchido") 
+                        ? error.message 
+                        : "Ocorreu um erro inesperado. Tente novamente.";
+                    renderConfirmationStep(false, errorMessage);
+                    currentStep = 4;
+                    updateFooter();
+                    nextBtn.textContent = 'Fechar'; nextBtn.disabled = false; nextBtn.onclick = closeModal; nextBtn.classList.remove('hidden');
+                }
+            }
+
+            function sendWhatsAppMessage() {
+                const clientName = appointment.client.name;
+                const serviceName = appointment.service.name;
+                const startTime = new Date(appointment.date);
+                startTime.setHours(appointment.time.getHours(), appointment.time.getMinutes());
+                const dateString = startTime.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                const timeString = startTime.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+                const message = `Olá, sou ${clientName} e acabei de fazer um agendamento pelo site.\n\n*Serviço:* ${serviceName}\n*Data:* ${dateString}\n*Horário:* ${timeString}`;
+                const encodedMessage = encodeURIComponent(message);
+                const whatsappUrl = `https://wa.me/${YOUR_WHATSAPP_NUMBER}?text=${encodedMessage}`;
+                window.open(whatsappUrl, '_blank');
+            }
+
+            openModalBtn.addEventListener('click', openModal);
+            closeModalBtn.addEventListener('click', closeModal);
+            modalBackdrop.addEventListener('click', closeModal);
+            backBtn.addEventListener('click', handleBackClick);
+            nextBtn.addEventListener('click', handleNextClick);
+
+            const sparkleContainer = document.getElementById('sparkle-bg');
+            if (sparkleContainer && sparkleContainer.children.length === 0) {
+                for (let i = 0; i < 40; i++) {
+                    const sparkle = document.createElement('div');
+                    sparkle.classList.add('sparkle');
+                    const size = Math.random() * 2.5 + 1;
+                    sparkle.style.width = `${size}px`; sparkle.style.height = `${size}px`;
+                    sparkle.style.left = `${Math.random() * 100}%`;
+                    sparkle.style.animationDuration = `${Math.random() * 15 + 10}s`;
+                    sparkle.style.animationDelay = `${Math.random() * 15}s`;
+                    if (Math.random() > 0.6) {
+                        sparkle.style.backgroundColor = 'var(--gold-main)';
+                        sparkle.style.boxShadow = '0 0 5px var(--gold-main), 0 0 10px var(--gold-main)';
+                    }
+                    sparkleContainer.appendChild(sparkle);
+                }
             }
         };
-        
-        const updateCaixaCard = (period, data) => {
-            const total = data.reduce((sum, item) => sum + (item.price || 0), 0);
-            const count = data.length;
-            document.getElementById(`caixa-${period}-total`).textContent = formatCurrency(total);
-            document.getElementById(`caixa-${period}-count`).textContent = `${count} serviço${count !== 1 ? 's' : ''}`;
-            document.getElementById(`caixa-${period}-card`).onclick = () => showCaixaDetails(period, data);
-        };
-        
-        const showCaixaDetails = (period, data) => {
-            const titleEl = document.getElementById('caixa-modal-title');
-            const contentEl = document.getElementById('caixa-modal-content');
-            const totalEl = document.getElementById('caixa-modal-total');
-        
-            const periodName = { dia: 'do Dia', semana: 'da Semana', mes: 'do Mês' };
-            titleEl.textContent = `Serviços Concluídos (${periodName[period]})`;
-        
-            contentEl.innerHTML = data.length === 0 
-                ? `<p class="p-4 text-center text-gray-500">Nenhum serviço concluído neste período.</p>`
-                : data.sort((a,b) => new Date(b.appointment_date) - new Date(a.appointment_date)).map(item => `
-                    <div class="p-3 flex justify-between items-center hover:bg-gray-800 rounded-md">
-                        <div>
-                            <p class="font-semibold text-gray-200">${item.service_name}</p>
-                            <p class="text-sm text-gray-400">Cliente: ${item.client_name} - ${new Date(item.appointment_date + 'T00:00:00').toLocaleDateString('pt-BR')}</p>
+
+        // =================================================================
+        // =================== LÓGICA DO PAINEL ADMIN ======================
+        // =================================================================
+        function initAdmin() {
+            const mainContent = document.getElementById('main-content');
+            const navLinks = document.querySelectorAll('#admin-panel .sidebar-link');
+            const adminPanel = document.getElementById('admin-panel');
+            const loginScreen = document.getElementById('login-screen');
+            const loginForm = document.getElementById('login-form');
+            const loginError = document.getElementById('login-error');
+            const logoutButton = document.getElementById('logout-button');
+            const goToSiteLink = document.getElementById('go-to-site');
+
+            if (adminPanel.dataset.initialized) {
+                checkAuth();
+                return;
+            }
+            adminPanel.dataset.initialized = 'true';
+
+            let currentView = window.location.hash.split('/')[2] || 'hours';
+            let adminCalendarDate = new Date();
+            window.adminSelectedDate = new Date();
+
+            // --- Funções do Modal de Confirmação e Toast ---
+            const confirmModal = document.getElementById('admin-confirm-modal');
+            const toast = document.getElementById('toast-notification');
+
+            const showAdminConfirm = (title, text, onConfirm, type = 'confirm') => {
+                const titleEl = document.getElementById('admin-confirm-title');
+                const textEl = document.getElementById('admin-confirm-text');
+                const iconEl = document.getElementById('admin-confirm-icon');
+                const okBtn = document.getElementById('admin-confirm-ok');
+                const cancelBtn = document.getElementById('admin-confirm-cancel');
+
+                titleEl.textContent = title;
+                textEl.textContent = text;
+                
+                let iconHTML = '';
+                if (type === 'delete') {
+                    iconEl.className = 'w-12 h-12 rounded-full mx-auto flex items-center justify-center mb-4 bg-red-500/20';
+                    iconHTML = '<svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>';
+                    okBtn.textContent = 'Excluir';
+                    okBtn.className = 'flex-1 text-white bg-red-600 hover:bg-red-700 font-medium rounded-lg text-sm px-5 py-2.5 text-center transition-all';
+                } else { // 'confirm'
+                    iconEl.className = 'w-12 h-12 rounded-full mx-auto flex items-center justify-center mb-4 bg-blue-500/20';
+                    iconHTML = '<svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>';
+                    okBtn.textContent = 'Confirmar';
+                    okBtn.className = 'flex-1 text-white bg-pink-600 hover:bg-pink-700 font-medium rounded-lg text-sm px-5 py-2.5 text-center transition-all';
+                }
+                iconEl.innerHTML = iconHTML;
+
+                confirmModal.classList.remove('modal-hidden');
+                
+                okBtn.onclick = () => {
+                    onConfirm();
+                    confirmModal.classList.add('modal-hidden');
+                };
+                cancelBtn.onclick = () => confirmModal.classList.add('modal-hidden');
+            };
+
+            const showToast = (message, type = 'success') => {
+                const toastMessage = document.getElementById('toast-message');
+                const toastIcon = document.getElementById('toast-icon');
+                
+                toastMessage.textContent = message;
+                let iconHTML = '';
+                if (type === 'success') {
+                    toastIcon.className = 'inline-flex items-center justify-center flex-shrink-0 w-8 h-8 rounded-lg bg-green-500/20 text-green-400';
+                    iconHTML = '<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>';
+                } else { // 'error'
+                    toastIcon.className = 'inline-flex items-center justify-center flex-shrink-0 w-8 h-8 rounded-lg bg-red-500/20 text-red-400';
+                    iconHTML = '<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>';
+                }
+                toastIcon.innerHTML = iconHTML;
+
+                toast.classList.add('show');
+                setTimeout(() => toast.classList.remove('show'), 3000);
+            };
+            
+            // **CORREÇÃO DO ERRO**: Funções movidas para o topo do escopo de initAdmin
+            const showAdminPanel = () => {
+                loginScreen.style.display = 'none';
+                adminPanel.style.display = 'flex';
+                navigate(currentView);
+            };
+
+            const showLoginScreen = (errorMsg = '') => {
+                adminPanel.style.display = 'none';
+                loginScreen.style.display = 'flex';
+                loginError.textContent = errorMsg;
+                loginError.classList.toggle('hidden', !errorMsg);
+            };
+
+            const navigate = (view) => {
+                currentView = view;
+                window.location.hash = `#/admin/${view}`;
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.id === `nav-${view}`) link.classList.add('active');
+                });
+                renderCurrentView();
+            };
+            
+            const renderCurrentView = () => {
+                showLoader();
+                setTimeout(() => {
+                    switch (currentView) {
+                        case 'appointments': renderAppointmentsView(); break;
+                        case 'services': renderServicesView(); break;
+                        case 'hours': renderHoursView(); break;
+                        default: navigate('hours'); // Rota padrão
+                    }
+                }, 50);
+            };
+
+            const showLoader = () => { mainContent.innerHTML = `<div class="flex justify-center items-center h-full">${createLoaderHTML('w-16 h-16')}</div>`; };
+
+            async function checkAuth() {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (session) {
+                    const { data: userProfile, error } = await supabase.from('users').select('role').eq('auth_user_id', session.user.id).single();
+                    if (error && error.code === 'PGRST116') { 
+                        await supabase.auth.signOut();
+                        showLoginScreen('Perfil de administrador não encontrado. Verifique se o seu User ID de autenticação foi associado na tabela de usuários.');
+                        return;
+                    }
+                    if (error) {
+                         await supabase.auth.signOut();
+                         showLoginScreen(`Erro de permissão: ${error.message}. Verifique as políticas de segurança (RLS).`);
+                         return;
+                    }
+                    if (userProfile && userProfile.role === 'admin') {
+                        showAdminPanel();
+                    } else {
+                        await supabase.auth.signOut();
+                        showLoginScreen('Acesso não autorizado. Apenas administradores.');
+                    }
+                } else {
+                    showLoginScreen();
+                }
+            };
+            
+            async function renderAppointmentsView() {
+                try {
+                    const { data, error } = await supabase.from('appointments')
+                        .select(`id, start_time, status, client_name, client_phone, services ( name )`)
+                        .order('start_time', { ascending: true });
+
+                    if (error) throw error;
+
+                    const activeAppointments = data.filter(app => app.status === 'pending' || app.status === 'confirmed');
+                    const cancelledAppointments = data.filter(app => app.status === 'cancelled');
+
+                    const createAppointmentRowHTML = (app) => {
+                        const isCancelled = app.status === 'cancelled';
+                        const statusBadge = isCancelled 
+                            ? `<span class="px-2 py-1 text-xs font-medium rounded-full bg-gray-700 text-gray-300">Cancelado</span>`
+                            : `<span class="px-2 py-1 text-xs font-medium rounded-full bg-yellow-900 text-yellow-300">${app.status}</span>`;
+                        
+                        const actionButton = isCancelled
+                            ? `<button data-id="${app.id}" class="delete-appointment-btn text-red-500 hover:text-red-400">Excluir</button>`
+                            : `<button data-id="${app.id}" class="cancel-btn text-yellow-500 hover:text-yellow-400">Cancelar</button>`;
+
+                        return `<tr class="border-b border-gray-700 hover:bg-gray-800">
+                            <td class="p-4">${new Date(app.start_time).toLocaleString('pt-BR')}</td>
+                            <td class="p-4">${app.client_name}</td>
+                            <td class="p-4">${app.client_phone}</td>
+                            <td class="p-4">${app.services ? app.services.name : 'Serviço Removido'}</td>
+                            <td class="p-4">${statusBadge}</td>
+                            <td class="p-4 text-right">${actionButton}</td>
+                        </tr>`;
+                    };
+
+                    const activeAppointmentsHTML = activeAppointments.length > 0 
+                        ? activeAppointments.map(createAppointmentRowHTML).join('') 
+                        : `<tr><td colspan="6" class="p-4 text-center text-gray-500">Nenhum agendamento ativo encontrado.</td></tr>`;
+
+                    const cancelledAppointmentsHTML = cancelledAppointments.length > 0 
+                        ? cancelledAppointments.map(createAppointmentRowHTML).join('') 
+                        : `<tr><td colspan="6" class="p-4 text-center text-gray-500">Nenhum agendamento cancelado.</td></tr>`;
+
+                    const tableHeader = `<thead class="bg-gray-700/50"><tr><th class="p-4 font-semibold">Data e Hora</th><th class="p-4 font-semibold">Cliente</th><th class="p-4 font-semibold">Telefone</th><th class="p-4 font-semibold">Serviço</th><th class="p-4 font-semibold">Status</th><th class="p-4 font-semibold text-right">Ações</th></tr></thead>`;
+
+                    mainContent.innerHTML = `
+                        <div class="space-y-8">
+                            <div>
+                                <h1 class="text-3xl font-bold mb-6">Próximos Agendamentos</h1>
+                                <div class="bg-gray-800 rounded-lg shadow-lg overflow-auto">
+                                    <table class="w-full text-left text-sm">${tableHeader}<tbody>${activeAppointmentsHTML}</tbody></table>
+                                </div>
+                            </div>
+                            <div>
+                                <h2 class="text-2xl font-bold mb-6">Agendamentos Cancelados</h2>
+                                <div class="bg-gray-800 rounded-lg shadow-lg overflow-auto">
+                                    <table class="w-full text-left text-sm">${tableHeader}<tbody>${cancelledAppointmentsHTML}</tbody></table>
+                                </div>
+                            </div>
                         </div>
-                        <div class="font-bold text-green-400">${formatCurrency(item.price || 0)}</div>
+                    `;
+                } catch (error) {
+                    console.error("Erro ao buscar agendamentos:", error);
+                    mainContent.innerHTML = `<div class="text-red-400">Erro ao carregar agendamentos: ${error.message}</div>`;
+                }
+            }
+
+            async function renderServicesView() {
+                try {
+                    const { data, error } = await supabase.from('services').select('*').order('name');
+                    if (error) throw error;
+                    const servicesHTML = data.map(service => `<div class="bg-gray-800 p-4 rounded-lg flex justify-between items-center"><div><h3 class="font-semibold text-white">${service.name}</h3><p class="text-sm text-gray-400">${service.duration_minutes} min - R$ ${Number(service.price).toFixed(2).replace('.', ',')}</p></div><div class="flex gap-4"><button data-id="${service.id}" class="edit-service-btn text-blue-400 hover:text-blue-300">Editar</button><button data-id="${service.id}" class="delete-service-btn text-red-500 hover:text-red-400">Excluir</button></div></div>`).join('');
+                    mainContent.innerHTML = `<h1 class="text-3xl font-bold mb-6">Gerir Serviços</h1><div class="grid grid-cols-1 md:grid-cols-2 gap-8"><div class="bg-gray-800 p-6 rounded-lg shadow-lg"><h2 id="form-title" class="text-xl font-semibold mb-4">Adicionar Novo Serviço</h2><form id="service-form" class="space-y-4"><input type="hidden" id="service-id"><div><label for="service-name" class="block text-sm font-medium mb-1">Nome do Serviço</label><input type="text" id="service-name" required class="w-full p-2 rounded-md form-input"></div><div><label for="service-duration" class="block text-sm font-medium mb-1">Duração (minutos)</label><input type="number" id="service-duration" required class="w-full p-2 rounded-md form-input"></div><div><label for="service-price" class="block text-sm font-medium mb-1">Preço (R$)</label><input type="number" step="0.01" id="service-price" required class="w-full p-2 rounded-md form-input"></div><div><label for="service-desc" class="block text-sm font-medium mb-1">Descrição (opcional)</label><textarea id="service-desc" rows="3" class="w-full p-2 rounded-md form-input"></textarea></div><div class="flex gap-4"><button type="submit" class="w-full py-2 px-4 rounded-md text-white font-semibold btn-primary">Salvar</button><button type="button" id="cancel-edit-btn" class="w-full py-2 px-4 rounded-md text-white font-semibold btn-secondary hidden">Cancelar</button></div></form></div><div id="services-list-container" class="space-y-4">${servicesHTML || '<p class="text-gray-500">Nenhum serviço cadastrado.</p>'}</div></div>`;
+                    
+                    mainContent.querySelector('#service-form').addEventListener('submit', handleServiceSubmit);
+                    mainContent.querySelector('#cancel-edit-btn').addEventListener('click', resetServiceForm);
+                    mainContent.querySelector('#services-list-container').addEventListener('click', handleAdminActions);
+
+                } catch (error) {
+                    console.error("Erro ao buscar serviços:", error);
+                    mainContent.innerHTML = `<div class="text-red-400">Erro ao carregar serviços: ${error.message}</div>`;
+                }
+            }
+
+            async function renderHoursView() {
+                mainContent.innerHTML = `
+                    <h1 class="text-3xl font-bold mb-6">Gestão de Horários</h1>
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <div class="lg:col-span-1 bg-gray-800 p-4 rounded-lg">
+                            <div class="flex items-center justify-between mb-4">
+                                <button id="admin-prev-month" class="p-2 rounded-full hover:bg-gray-700" aria-label="Mês anterior">&larr;</button>
+                                <h5 id="admin-month-year" class="font-semibold text-lg text-white"></h5>
+                                <button id="admin-next-month" class="p-2 rounded-full hover:bg-gray-700" aria-label="Próximo mês">&rarr;</button>
+                            </div>
+                            <div class="grid grid-cols-7 text-center text-xs text-gray-400 mb-2">
+                                <span>Dom</span><span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span>
+                            </div>
+                            <div id="admin-calendar-grid" class="admin-calendar-grid"></div>
+                        </div>
+                        <div id="admin-schedule-container" class="lg:col-span-2 bg-gray-800 p-4 rounded-lg">
+                            <div id="admin-schedule-title" class="text-xl font-semibold mb-4 text-center">Selecione um dia para ver os horários</div>
+                            <div id="admin-schedule-slots" class="space-y-2 max-h-[60vh] overflow-y-auto pr-2">
+                                <!-- Horários do dia selecionado aparecerão aqui -->
+                            </div>
+                        </div>
                     </div>
-                `).join('');
-        
-            const total = data.reduce((sum, item) => sum + (item.price || 0), 0);
-            totalEl.textContent = `Total: ${formatCurrency(total)}`;
-        
-            toggleModal('caixa', true);
+                `;
+                
+                document.getElementById('admin-prev-month').onclick = () => { adminCalendarDate.setMonth(adminCalendarDate.getMonth() - 1); renderAdminCalendar(); };
+                document.getElementById('admin-next-month').onclick = () => { adminCalendarDate.setMonth(adminCalendarDate.getMonth() + 1); renderAdminCalendar(); };
+                
+                await renderAdminCalendar();
+                await loadAdminDaySchedule(window.adminSelectedDate);
+            }
+
+            async function renderAdminCalendar() {
+                const calendarGrid = document.getElementById('admin-calendar-grid');
+                if (!calendarGrid) return;
+                
+                const month = adminCalendarDate.getMonth();
+                const year = adminCalendarDate.getFullYear();
+                document.getElementById('admin-month-year').textContent = `${adminCalendarDate.toLocaleString('pt-BR', { month: 'long' })} ${year}`;
+                
+                const firstDayOfMonth = new Date(year, month, 1);
+                const lastDayOfMonth = new Date(year, month + 1, 0);
+
+                const { data: openDays, error } = await supabase
+                    .from('open_days')
+                    .select('open_date')
+                    .gte('open_date', firstDayOfMonth.toISOString().slice(0,10))
+                    .lte('open_date', lastDayOfMonth.toISOString().slice(0,10));
+
+                if (error) {
+                    console.error("Erro ao buscar dias abertos:", error);
+                    calendarGrid.innerHTML = `<p class="text-red-400">Erro</p>`;
+                    return;
+                }
+                
+                const openDatesSet = new Set(openDays.map(d => d.open_date));
+                
+                calendarGrid.innerHTML = '';
+                const startDay = firstDayOfMonth.getDay();
+                const daysInMonth = lastDayOfMonth.getDate();
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+
+                for (let i = 0; i < startDay; i++) calendarGrid.insertAdjacentHTML('beforeend', `<div class="p-2"></div>`);
+
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const thisDate = new Date(year, month, day);
+                    const thisDateString = thisDate.toISOString().slice(0,10);
+
+                    const dayElement = document.createElement('div');
+                    dayElement.innerHTML = `<span class="flex items-center justify-center h-8 w-8 rounded-full">${day}</span>`;
+                    dayElement.className = 'admin-calendar-day p-1';
+                    dayElement.dataset.date = thisDate.toISOString();
+                    
+                    if (openDatesSet.has(thisDateString)) {
+                        dayElement.classList.add('open');
+                    } else {
+                        dayElement.classList.add('closed');
+                    }
+
+                    if (thisDate.getTime() === today.getTime()) dayElement.classList.add('today');
+                    if (window.adminSelectedDate && thisDate.toDateString() === window.adminSelectedDate.toDateString()) dayElement.classList.add('selected');
+                    
+                    calendarGrid.appendChild(dayElement);
+                }
+
+                calendarGrid.onclick = (e) => {
+                    const dayElement = e.target.closest('.admin-calendar-day');
+                    if (!dayElement || dayElement.classList.contains('other-month') || !dayElement.dataset.date) return;
+                    window.adminSelectedDate = new Date(dayElement.dataset.date);
+                    renderAdminCalendar(); // Re-render to show selection
+                    loadAdminDaySchedule(window.adminSelectedDate);
+                };
+            }
+
+            async function loadAdminDaySchedule(date) {
+                const scheduleContainer = document.getElementById('admin-schedule-slots');
+                const scheduleTitle = document.getElementById('admin-schedule-title');
+                
+                scheduleTitle.innerHTML = `
+                    <div class="flex flex-col sm:flex-row justify-between items-center gap-2">
+                        <span class="font-semibold">Horários para ${date.toLocaleDateString('pt-BR', {weekday: 'long', day: '2-digit', month: '2-digit'})}</span>
+                        <div>
+                            <button id="open-day-btn" class="text-xs bg-green-600 hover:bg-green-700 text-white font-bold py-1 px-3 rounded">Abrir Dia</button>
+                            <button id="close-day-btn" class="text-xs bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-3 rounded">Fechar Dia</button>
+                        </div>
+                    </div>
+                `;
+                scheduleContainer.innerHTML = createLoaderHTML('h-8 w-8');
+                
+                document.getElementById('open-day-btn').onclick = () => toggleDayStatus(true, date);
+                document.getElementById('close-day-btn').onclick = () => toggleDayStatus(false, date);
+                
+                const dateString = date.toISOString().slice(0,10);
+                const dateStringStart = new Date(date).setHours(0,0,0,0);
+                const dateStringEnd = new Date(date).setHours(23,59,59,999);
+
+                try {
+                    const [appRes, blockedRes, openDayRes] = await Promise.all([
+                        supabase.from('appointments').select(`*, services(name, duration_minutes), client_name`).gte('start_time', new Date(dateStringStart).toISOString()).lt('start_time', new Date(dateStringEnd).toISOString()).in('status', ['pending', 'confirmed']),
+                        supabase.from('blocked_slots').select(`*`).gte('slot_time', new Date(dateStringStart).toISOString()).lt('slot_time', new Date(dateStringEnd).toISOString()),
+                        supabase.from('open_days').select('open_date').eq('open_date', dateString).maybeSingle()
+                    ]);
+                    if (appRes.error) throw appRes.error;
+                    if (blockedRes.error) throw blockedRes.error;
+                    if (openDayRes.error) throw openDayRes.error;
+
+                    const isDayOpen = !!openDayRes.data;
+                    renderAdminTimeSlots(date, appRes.data, blockedRes.data, isDayOpen);
+                } catch (error) {
+                    console.error("Erro ao buscar agenda do dia:", error);
+                    scheduleContainer.innerHTML = `<p class="text-red-400">Erro ao carregar agenda.</p>`;
+                }
+            }
+            
+            async function toggleDayStatus(shouldOpen, date) {
+                const dateString = date.toISOString().slice(0,10);
+                let error;
+                if (shouldOpen) { // Abrir o dia
+                    ({ error } = await supabase.from('open_days').upsert({ open_date: dateString }, { onConflict: 'open_date' }));
+                } else { // Fechar o dia
+                    ({ error } = await supabase.from('open_days').delete().eq('open_date', dateString));
+                }
+
+                if (error) {
+                    showToast(`Erro ao alterar status do dia: ${error.message}`, 'error');
+                } else {
+                    showToast(`Dia ${shouldOpen ? 'aberto' : 'fechado'} com sucesso!`, 'success');
+                    await renderAdminCalendar();
+                    await loadAdminDaySchedule(date);
+                }
+            }
+
+            function renderAdminTimeSlots(date, appointments, blockedSlots, isDayOpen) {
+                const scheduleContainer = document.getElementById('admin-schedule-slots');
+                scheduleContainer.innerHTML = '';
+
+                if (!isDayOpen) {
+                    scheduleContainer.className = 'space-y-2';
+                    scheduleContainer.innerHTML = `<div class="p-4 mt-4 text-center text-gray-400 bg-red-900/50 rounded-lg">Este dia está fechado. Clique em "Abrir Dia" para liberar horários.</div>`;
+                    return;
+                }
+                
+                scheduleContainer.className = 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3';
+                
+                for (let hour = 7; hour < 23; hour++) {
+                    const slotStart = new Date(date);
+                    slotStart.setHours(hour, 0, 0, 0);
+
+                    const bookedAppointment = appointments.find(app => {
+                        const appStart = new Date(app.start_time);
+                        const appEnd = new Date(appStart.getTime() + app.services.duration_minutes * 60000);
+                        return slotStart < appEnd && new Date(slotStart.getTime() + 60 * 60000) > appStart;
+                    });
+                    const blockedSlot = blockedSlots.find(bs => new Date(bs.slot_time).getTime() === slotStart.getTime());
+
+                    const timeString = slotStart.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+                    
+                    const slotElement = document.createElement('div');
+                    slotElement.dataset.slotTime = slotStart.toISOString();
+
+                    let statusClass, statusText, detailsHTML = '';
+
+                    if (bookedAppointment) {
+                        statusClass = 'booked';
+                        statusText = 'AGENDADO';
+                        detailsHTML = `<p class="text-xs text-white/70 truncate" title="${bookedAppointment.client_name}">${bookedAppointment.client_name}</p>`;
+                    } else if (blockedSlot) {
+                        statusClass = 'closed';
+                        statusText = 'FECHADO';
+                    } else {
+                        statusClass = 'available';
+                        statusText = 'ABERTO';
+                    }
+                    
+                    slotElement.className = `admin-slot ${statusClass} p-2 rounded-lg text-center flex flex-col justify-center items-center h-20`;
+                    slotElement.innerHTML = `
+                        <span class="font-bold text-base">${timeString}</span>
+                        <span class="text-xs mt-1">${statusText}</span>
+                        ${detailsHTML}
+                    `;
+                    
+                    scheduleContainer.appendChild(slotElement);
+                }
+
+                scheduleContainer.onclick = async (e) => {
+                    const slotElement = e.target.closest('.admin-slot');
+                    if (!slotElement || slotElement.classList.contains('booked')) return;
+
+                    const slotTime = slotElement.dataset.slotTime;
+                    
+                    if (slotElement.classList.contains('available')) {
+                        const { error } = await supabase.from('blocked_slots').insert({ slot_time: slotTime });
+                        if (error) showToast(`Erro ao bloquear horário: ${error.message}`, 'error');
+                    } else if (slotElement.classList.contains('closed')) {
+                        const { error } = await supabase.from('blocked_slots').delete().eq('slot_time', slotTime);
+                        if (error) showToast(`Erro ao desbloquear horário: ${error.message}`, 'error');
+                    }
+                    loadAdminDaySchedule(window.adminSelectedDate);
+                };
+            }
+
+            async function handleServiceSubmit(e) {
+                e.preventDefault();
+                const form = e.target;
+                const id = form['service-id'].value;
+                const serviceData = { name: form['service-name'].value, duration_minutes: parseInt(form['service-duration'].value), price: parseFloat(form['service-price'].value), description: form['service-desc'].value };
+                const { error } = id ? await supabase.from('services').update(serviceData).eq('id', id) : await supabase.from('services').insert(serviceData);
+                if (error) {
+                    showToast(`Erro ao salvar serviço: ${error.message}`, 'error');
+                } else {
+                    showToast(`Serviço ${id ? 'atualizado' : 'criado'} com sucesso!`, 'success');
+                    renderServicesView();
+                }
+            }
+
+            async function handleAdminActions(e) {
+                const target = e.target.closest('.cancel-btn, .edit-service-btn, .delete-service-btn, .delete-appointment-btn');
+                if (!target) return;
+
+                const id = target.dataset.id;
+                if (!id) return;
+
+                if (target.classList.contains('delete-service-btn')) {
+                    showAdminConfirm('Excluir Serviço?', 'Esta ação é irreversível. Todos os agendamentos futuros com este serviço podem ser afetados.', async () => {
+                        const { error } = await supabase.from('services').delete().eq('id', id);
+                        if (error) showToast(`Erro ao excluir: ${error.message}`, 'error');
+                        else {
+                            showToast('Serviço excluído com sucesso.', 'success');
+                            renderServicesView();
+                        }
+                    }, 'delete');
+                }
+                if (target.classList.contains('edit-service-btn')) {
+                    const { data, error } = await supabase.from('services').select('*').eq('id', id).single();
+                    if (error) { showToast(`Erro ao buscar serviço: ${error.message}`, 'error'); return; }
+                    const form = document.getElementById('service-form');
+                    form['service-id'].value = data.id; form['service-name'].value = data.name; form['service-duration'].value = data.duration_minutes; form['service-price'].value = data.price; form['service-desc'].value = data.description;
+                    document.getElementById('form-title').innerText = 'Editar Serviço';
+                    document.getElementById('cancel-edit-btn').classList.remove('hidden');
+                }
+                if (target.classList.contains('cancel-btn')) {
+                    showAdminConfirm('Cancelar Agendamento?', 'Tem certeza que deseja cancelar este agendamento? O cliente não será notificado automaticamente.', async () => {
+                        const { error } = await supabase.from('appointments').update({ status: 'cancelled' }).eq('id', id);
+                        if (error) showToast(`Erro ao cancelar: ${error.message}`, 'error');
+                        else {
+                            showToast('Agendamento cancelado.', 'success');
+                            renderAppointmentsView();
+                        }
+                    }, 'delete');
+                }
+                if (target.classList.contains('delete-appointment-btn')) {
+                    showAdminConfirm('Excluir Agendamento?', 'Esta ação é permanente e não pode ser desfeita.', async () => {
+                        const { error } = await supabase.from('appointments').delete().eq('id', id);
+                        if (error) {
+                            showToast(`Erro ao excluir agendamento: ${error.message}`, 'error');
+                        } else {
+                            showToast('Agendamento excluído permanentemente.', 'success');
+                            renderAppointmentsView();
+                        }
+                    }, 'delete');
+                }
+            }
+            
+            function resetServiceForm() {
+                const form = document.getElementById('service-form');
+                form.reset(); form['service-id'].value = '';
+                document.getElementById('form-title').innerText = 'Adicionar Novo Serviço';
+                document.getElementById('cancel-edit-btn').classList.add('hidden');
+            }
+
+            loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                loginError.classList.add('hidden');
+                const email = e.target.email.value;
+                const password = e.target.password.value;
+                const { error } = await supabase.auth.signInWithPassword({ email, password });
+                if (error) {
+                    showLoginScreen('Email ou senha inválidos.');
+                } else {
+                    checkAuth();
+                }
+            });
+            logoutButton.addEventListener('click', async (e) => { e.preventDefault(); await supabase.auth.signOut(); window.location.hash = ''; handleRouting(); });
+            goToSiteLink.addEventListener('click', (e) => { e.preventDefault(); window.location.hash = ''; handleRouting(); });
+            mainContent.addEventListener('click', handleAdminActions);
+            
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    if (e.currentTarget.id.startsWith('nav-')) {
+                        e.preventDefault();
+                        const view = e.currentTarget.id.replace('nav-', '');
+                        navigate(view);
+                    }
+                });
+            });
+
+            checkAuth();
         };
-    };
-    
-    // =================================================================================
-    // APPLICATION ENTRY POINT
-    // =================================================================================
-    document.addEventListener('DOMContentLoaded', () => {
-        clientViewLogic();
-        adminPanelLogic();
-        showView('client');
-    });
+
+        // --- INICIALIZAÇÃO GERAL ---
+        window.addEventListener('DOMContentLoaded', handleRouting);
+        window.addEventListener('hashchange', handleRouting);
     </script>
 
 </body>
