@@ -22,7 +22,7 @@
             --border-color: #374151; --text-primary: #f9fafb; --text-secondary: #9ca3af;
             --pink-accent: #ec4899; --pink-hover: #f472b6; --gold-main: #d4af37;
             --green-available: #16a34a; --red-closed: #be123c; --yellow-booked: #d97706;
-            --blue-info: #3b82f6; --red-error: #ef4444;
+            --blue-info: #3b82f6; --red-error: #ef4444; --green-paid: #22c55e;
         }
         body { font-family: 'Poppins', sans-serif; background-color: var(--bg-dark-primary); color: var(--text-primary); }
         #client-view, #admin-view { display: none; }
@@ -34,7 +34,6 @@
         .float-animation { animation: float 6s ease-in-out infinite; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         .animate-on-load { opacity: 0; animation: fadeIn 1s ease-out forwards; }
-        .logo-initials { animation-delay: 0.2s; } .logo-name { animation-delay: 0.8s; } .logo-title { animation-delay: 1.0s; } .main-button { animation-delay: 1.4s; } .footer-links { animation-delay: 1.8s; }
         .font-logo-serif { font-family: 'Playfair Display', serif; font-weight: 700; }
         .modal-backdrop { transition: opacity 0.3s ease-in-out; }
         .modal-content { transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out; }
@@ -137,15 +136,19 @@
         </div>
 
         <!-- Painel Administrativo -->
-        <div id="admin-panel" class="flex h-screen bg-gray-900 text-gray-100">
+        <div id="admin-panel" class="relative min-h-screen lg:flex">
+            <!-- Mobile Menu Backdrop -->
+            <div id="mobile-menu-backdrop" class="fixed inset-0 bg-black/50 z-30 hidden lg:hidden"></div>
+
             <!-- Sidebar -->
-            <aside class="w-64 flex-shrink-0 bg-gray-800 p-4 flex flex-col justify-between">
+            <aside id="admin-sidebar" class="fixed top-0 left-0 h-full w-64 bg-gray-800 p-4 flex flex-col justify-between z-40 transform -translate-x-full transition-transform duration-300 lg:translate-x-0">
                 <div>
                     <div class="flex items-center gap-3 mb-8"><div class="w-10 h-10 bg-pink-500 rounded-full flex items-center justify-center font-bold text-xl">T</div><span class="text-xl font-semibold">Painel Admin</span></div>
                     <nav class="space-y-2">
                         <a href="#/admin/appointments" id="nav-appointments" class="sidebar-link flex items-center gap-3 px-4 py-2 rounded-lg"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd" /></svg><span>Agendamentos</span></a>
                         <a href="#/admin/services" id="nav-services" class="sidebar-link flex items-center gap-3 px-4 py-2 rounded-lg"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z" /></svg><span>Serviços</span></a>
                         <a href="#/admin/hours" id="nav-hours" class="sidebar-link flex items-center gap-3 px-4 py-2 rounded-lg"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.414-1.414L11 10.586V6z" clip-rule="evenodd" /></svg><span>Horários</span></a>
+                        <a href="#/admin/cashflow" id="nav-cashflow" class="sidebar-link flex items-center gap-3 px-4 py-2 rounded-lg"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.5 2.5 0 00-.567-.267C8.07 8.34 8 8.444 8 8.5v.509c0 .545.502.836 1.002.95.498.113.703.26.703.434 0 .103-.14.231-.433.325A3.012 3.012 0 019 11.5v1.5a4.512 4.512 0 001.5-.267c.666-.248 1.5-1.05 1.5-2.233 0-1.328-.834-1.958-1.5-2.233A4.507 4.507 0 009 6.5v-1.5a3.01 3.01 0 011.5.267c.905.336 1.5.93 1.5 1.733 0 .65-.42 1.138-1.002 1.33A2.5 2.5 0 0012 10.5v.508c0 .545-.502.836-1.002.95-.498.113-.703.26-.703.434 0 .103.14.231.433.325A3.012 3.012 0 0111 12.5v1.5a4.512 4.512 0 00-1.5-.267c-.666-.248-1.5-1.05-1.5-2.233 0-1.328.834-1.958 1.5-2.233A4.507 4.507 0 0011 5.5v-1.5a3.01 3.01 0 01-1.5.267c-.905.336-1.5.93-1.5 1.733 0 .65.42 1.138 1.002 1.33z"/><path d="M2 2a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V4a2 2 0 00-2-2H2zm16 14H2V4h16v12z"/></svg><span>Caixa</span></a>
                     </nav>
                 </div>
                 <div class="border-t border-gray-700 pt-4 space-y-2">
@@ -153,7 +156,15 @@
                     <a href="#" id="logout-button" class="sidebar-link flex items-center gap-3 px-4 py-2 rounded-lg"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd" /></svg><span>Sair</span></a>
                 </div>
             </aside>
-            <main id="main-content" class="flex-1 p-6 lg:p-8 overflow-y-auto"></main>
+            <div class="flex-1 lg:ml-64">
+                <header class="sticky top-0 bg-gray-900/80 backdrop-blur-lg z-20 lg:hidden flex items-center justify-between p-4 border-b border-gray-700">
+                     <button id="mobile-menu-button" aria-label="Abrir menu">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                     </button>
+                     <span class="text-xl font-semibold">Painel Admin</span>
+                </header>
+                <main id="main-content" class="p-6 lg:p-8"></main>
+            </div>
         </div>
     </div>
     
@@ -188,6 +199,18 @@
                 <button id="admin-confirm-cancel" class="flex-1 text-white bg-gray-600 hover:bg-gray-700 font-medium rounded-lg text-sm px-5 py-2.5 text-center transition-all">Cancelar</button>
                 <button id="admin-confirm-ok" class="flex-1 text-white bg-pink-600 hover:bg-pink-700 font-medium rounded-lg text-sm px-5 py-2.5 text-center transition-all">Confirmar</button>
             </div>
+        </div>
+    </div>
+
+    <!-- MODAL DETALHES FLUXO DE CAIXA (ADMIN) -->
+    <div id="cashflow-details-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-hidden">
+        <div class="fixed inset-0 bg-black/60 backdrop-blur-sm modal-backdrop"></div>
+        <div class="relative bg-gray-800 border border-gray-700 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col modal-content">
+             <div class="flex items-center justify-between p-5 border-b border-gray-700 flex-shrink-0">
+                <h3 id="cashflow-details-title" class="text-xl font-semibold text-white"></h3>
+                <button id="close-cashflow-modal-button" type="button" class="text-gray-400 bg-transparent hover:bg-gray-600 hover:text-white rounded-lg text-sm p-1.5 ml-auto inline-flex items-center" aria-label="Fechar modal"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg></button>
+            </div>
+            <div id="cashflow-details-body" class="p-6 overflow-y-auto"></div>
         </div>
     </div>
 
@@ -407,7 +430,7 @@
                 const dateString = date.toISOString().slice(0, 10);
                 try {
                     const [appRes, blockedRes, openDaysRes] = await Promise.all([
-                        supabase.from('appointments').select('start_time, end_time').gte('start_time', `${dateString}T00:00:00Z`).lt('start_time', `${dateString}T23:59:59Z`).in('status', ['pending', 'confirmed']),
+                        supabase.from('appointments').select('start_time, end_time').gte('start_time', `${dateString}T00:00:00Z`).lt('start_time', `${dateString}T23:59:59Z`).in('status', ['pending', 'confirmed', 'paid']),
                         supabase.from('blocked_slots').select('slot_time').gte('slot_time', `${dateString}T00:00:00Z`).lt('slot_time', `${dateString}T23:59:59Z`),
                         supabase.from('open_days').select('open_date').eq('open_date', dateString)
                     ]);
@@ -432,52 +455,67 @@
 
                 if (!isDayOpen) return [];
 
+                const workDayStartHour = 7;
+                const workDayEndHour = 22;
+                const totalMinutesInWorkDay = (workDayEndHour - workDayStartHour) * 60;
+                
+                // Cria uma linha do tempo para o dia de trabalho, em minutos, a partir da hora de início.
+                const timeline = new Array(totalMinutesInWorkDay).fill(true); // true = disponível
+
+                // Converte um objeto Date para o número de minutos desde o início do dia de trabalho (workDayStartHour).
+                // new Date() converte o tempo UTC do banco para o fuso horário local do navegador.
+                const getMinutesFromWorkdayStart = (d) => {
+                    const localDate = new Date(d);
+                    return (localDate.getHours() - workDayStartHour) * 60 + localDate.getMinutes();
+                };
+
+                // 1. Marca os agendamentos existentes na linha do tempo.
+                appointments.forEach(app => {
+                    const startMinute = getMinutesFromWorkdayStart(app.start_time);
+                    const endMinute = getMinutesFromWorkdayStart(app.end_time);
+
+                    for (let i = startMinute; i < endMinute; i++) {
+                        if (i >= 0 && i < totalMinutesInWorkDay) {
+                            timeline[i] = false; // false = ocupado
+                        }
+                    }
+                });
+
+                // 2. Marca os bloqueios manuais na linha do tempo.
+                blockedSlots.forEach(bs => {
+                    const startMinute = getMinutesFromWorkdayStart(bs.slot_time);
+                    const endMinute = startMinute + 60; // Bloqueio do admin dura 1 hora.
+
+                    for (let i = startMinute; i < endMinute; i++) {
+                        if (i >= 0 && i < totalMinutesInWorkDay) {
+                            timeline[i] = false;
+                        }
+                    }
+                });
+
                 const availableSlots = [];
-                const dayStart = new Date(date);
-                dayStart.setHours(7, 0, 0, 0); 
+                // 3. Verifica cada hora cheia para ver se o serviço "cabe".
+                for (let hour = workDayStartHour; hour < workDayEndHour; hour++) {
+                    const potentialStartMinuteInTimeline = (hour - workDayStartHour) * 60;
+                    const potentialEndMinuteInTimeline = potentialStartMinuteInTimeline + serviceDuration;
 
-                const dayEnd = new Date(date);
-                dayEnd.setHours(22, 0, 0, 0);
-
-                // MODIFICAÇÃO: Gera e verifica apenas slots de hora em hora para a visão do cliente.
-                for (let hour = 7; hour < 22; hour++) {
-                    const potentialSlotStart = new Date(date);
-                    potentialSlotStart.setHours(hour, 0, 0, 0);
-
-                    const potentialSlotEnd = new Date(potentialSlotStart.getTime() + serviceDuration * 60000);
-
-                    // Garante que o serviço termine antes do fim do expediente.
-                    if (potentialSlotEnd > dayEnd) {
+                    if (potentialEndMinuteInTimeline > totalMinutesInWorkDay) {
                         continue;
                     }
 
-                    let isColliding = false;
-
-                    // Verifica colisão com agendamentos existentes.
-                    // A lógica de colisão é: (InícioA < FimB) E (FimA > InícioB)
-                    for (const app of appointments) {
-                        const appStart = new Date(app.start_time);
-                        const appEnd = new Date(app.end_time);
-                        if (potentialSlotStart < appEnd && potentialSlotEnd > appStart) {
-                            isColliding = true;
-                            break; 
-                        }
-                    }
-
-                    if (isColliding) continue;
-
-                    // Verifica colisão com horários bloqueados manualmente pelo admin.
-                    for (const bs of blockedSlots) {
-                        const blockedStart = new Date(bs.slot_time);
-                        const blockedEnd = new Date(blockedStart.getTime() + 60 * 60000); // Bloqueio do admin dura 1 hora.
-                        if (potentialSlotStart < blockedEnd && potentialSlotEnd > blockedStart) {
-                            isColliding = true;
+                    let canFit = true;
+                    // Verifica se todos os minutos necessários estão disponíveis na linha do tempo.
+                    for (let i = potentialStartMinuteInTimeline; i < potentialEndMinuteInTimeline; i++) {
+                        if (!timeline[i]) {
+                            canFit = false;
                             break;
                         }
                     }
-                    
-                    if (!isColliding) {
-                        availableSlots.push(potentialSlotStart);
+
+                    if (canFit) {
+                        const slotDate = new Date(date);
+                        slotDate.setHours(hour, 0, 0, 0);
+                        availableSlots.push(slotDate);
                     }
                 }
 
@@ -627,6 +665,7 @@
         // =================== LÓGICA DO PAINEL ADMIN ======================
         // =================================================================
         function initAdmin() {
+            // Elementos do DOM
             const mainContent = document.getElementById('main-content');
             const navLinks = document.querySelectorAll('#admin-panel .sidebar-link');
             const adminPanel = document.getElementById('admin-panel');
@@ -635,20 +674,26 @@
             const loginError = document.getElementById('login-error');
             const logoutButton = document.getElementById('logout-button');
             const goToSiteLink = document.getElementById('go-to-site');
+            const sidebar = document.getElementById('admin-sidebar');
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenuBackdrop = document.getElementById('mobile-menu-backdrop');
+            const confirmModal = document.getElementById('admin-confirm-modal');
+            const toast = document.getElementById('toast-notification');
+            const cashflowDetailsModal = document.getElementById('cashflow-details-modal');
 
             if (adminPanel.dataset.initialized) {
-                checkAuth();
                 return;
             }
             adminPanel.dataset.initialized = 'true';
 
+            // Variáveis de Estado
             let currentView = window.location.hash.split('/')[2] || 'hours';
             let adminCalendarDate = new Date();
             window.adminSelectedDate = new Date();
+            let allPaidAppointments = []; // Cache para os agendamentos pagos
 
-            // --- Funções do Modal de Confirmação e Toast ---
-            const confirmModal = document.getElementById('admin-confirm-modal');
-            const toast = document.getElementById('toast-notification');
+            // --- Funções Auxiliares e de UI ---
+            const formatCurrency = (value) => `R$ ${value.toFixed(2).replace('.', ',')}`;
 
             const showAdminConfirm = (title, text, onConfirm, type = 'confirm') => {
                 const titleEl = document.getElementById('admin-confirm-title');
@@ -701,8 +746,74 @@
                 toast.classList.add('show');
                 setTimeout(() => toast.classList.remove('show'), 3000);
             };
+
+            const showCashFlowDetailsModal = (period, appointments) => {
+                const modal = document.getElementById('cashflow-details-modal');
+                const titleEl = document.getElementById('cashflow-details-title');
+                const bodyEl = document.getElementById('cashflow-details-body');
+                const closeBtn = document.getElementById('close-cashflow-modal-button');
+                const backdrop = modal.querySelector('.modal-backdrop');
+                
+                const now = new Date();
+                const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                const startOfWeek = new Date(today);
+                startOfWeek.setDate(today.getDate() - today.getDay());
+                const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+                let filteredAppointments = [];
+                let periodTitle = '';
+
+                switch(period) {
+                    case 'day':
+                        periodTitle = 'Faturamento de Hoje';
+                        filteredAppointments = appointments.filter(app => new Date(app.start_time) >= today);
+                        break;
+                    case 'week':
+                        periodTitle = 'Faturamento da Semana';
+                        filteredAppointments = appointments.filter(app => new Date(app.start_time) >= startOfWeek);
+                        break;
+                    case 'month':
+                        periodTitle = 'Faturamento do Mês';
+                        filteredAppointments = appointments.filter(app => new Date(app.start_time) >= startOfMonth);
+                        break;
+                }
+
+                titleEl.textContent = periodTitle;
+                
+                if (filteredAppointments.length === 0) {
+                    bodyEl.innerHTML = '<p class="text-center text-gray-400">Nenhuma transação neste período.</p>';
+                } else {
+                    const total = filteredAppointments.reduce((sum, app) => sum + (app.services ? app.services.price : 0), 0);
+                    const transactionsHTML = filteredAppointments
+                        .map(app => `
+                            <li class="flex justify-between items-center py-3 border-b border-gray-700">
+                                <div>
+                                    <p class="text-white">${app.client_name || 'Cliente'}</p>
+                                    <p class="text-xs text-gray-400">${new Date(app.start_time).toLocaleString('pt-BR')}</p>
+                                </div>
+                                <span class="font-semibold text-green-400">+ ${formatCurrency(app.services ? app.services.price : 0)}</span>
+                            </li>
+                        `).join('');
+                    
+                    bodyEl.innerHTML = `
+                        <ul class="space-y-1">${transactionsHTML}</ul>
+                        <div class="flex justify-between items-center mt-4 pt-4 border-t border-gray-600">
+                            <span class="text-lg font-bold text-white">TOTAL</span>
+                            <span class="text-lg font-bold text-green-400">${formatCurrency(total)}</span>
+                        </div>
+                    `;
+                }
+
+                modal.classList.remove('modal-hidden');
+                closeBtn.onclick = () => modal.classList.add('modal-hidden');
+                backdrop.onclick = () => modal.classList.add('modal-hidden');
+            };
             
-            // **CORREÇÃO DO ERRO**: Funções movidas para o topo do escopo de initAdmin
+            const toggleSidebar = () => {
+                sidebar.classList.toggle('-translate-x-full');
+                mobileMenuBackdrop.classList.toggle('hidden');
+            };
+            
             const showAdminPanel = () => {
                 loginScreen.style.display = 'none';
                 adminPanel.style.display = 'flex';
@@ -724,6 +835,11 @@
                     if (link.id === `nav-${view}`) link.classList.add('active');
                 });
                 renderCurrentView();
+                // Fecha a sidebar em navegação mobile
+                if (window.innerWidth < 1024) { // lg breakpoint
+                    sidebar.classList.add('-translate-x-full');
+                    mobileMenuBackdrop.classList.add('hidden');
+                }
             };
             
             const renderCurrentView = () => {
@@ -733,6 +849,7 @@
                         case 'appointments': renderAppointmentsView(); break;
                         case 'services': renderServicesView(); break;
                         case 'hours': renderHoursView(); break;
+                        case 'cashflow': renderCashFlowView(); break;
                         default: navigate('hours'); // Rota padrão
                     }
                 }, 50);
@@ -768,56 +885,80 @@
             async function renderAppointmentsView() {
                 try {
                     const { data, error } = await supabase.from('appointments')
-                        .select(`id, start_time, status, client_name, client_phone, services ( name )`)
-                        .order('start_time', { ascending: true });
+                        .select(`id, start_time, status, client_name, client_phone, services (name, price)`)
+                        .order('start_time', { ascending: false });
 
                     if (error) throw error;
 
-                    const activeAppointments = data.filter(app => app.status === 'pending' || app.status === 'confirmed');
-                    const cancelledAppointments = data.filter(app => app.status === 'cancelled');
+                    const appointmentsByStatus = data.reduce((acc, app) => {
+                        const status = app.status || 'pending';
+                        if (!acc[status]) acc[status] = [];
+                        acc[status].push(app);
+                        return acc;
+                    }, {});
+
+                    const confirmedAppointments = appointmentsByStatus.confirmed || [];
+                    const paidAppointments = appointmentsByStatus.paid || [];
+                    const cancelledAppointments = appointmentsByStatus.cancelled || [];
 
                     const createAppointmentRowHTML = (app) => {
-                        const isCancelled = app.status === 'cancelled';
-                        const statusBadge = isCancelled 
-                            ? `<span class="px-2 py-1 text-xs font-medium rounded-full bg-gray-700 text-gray-300">Cancelado</span>`
-                            : `<span class="px-2 py-1 text-xs font-medium rounded-full bg-yellow-900 text-yellow-300">${app.status}</span>`;
-                        
-                        const actionButton = isCancelled
-                            ? `<button data-id="${app.id}" class="delete-appointment-btn text-red-500 hover:text-red-400">Excluir</button>`
-                            : `<button data-id="${app.id}" class="cancel-btn text-yellow-500 hover:text-yellow-400">Cancelar</button>`;
+                        let statusBadge = '';
+                        let actionButton = '';
+
+                        switch (app.status) {
+                            case 'confirmed':
+                                statusBadge = `<span class="px-2 py-1 text-xs font-medium rounded-full bg-yellow-900 text-yellow-300">Confirmado</span>`;
+                                actionButton = `
+                                    <button data-id="${app.id}" class="mark-paid-btn text-green-400 hover:text-green-300 mr-4">Marcar como Pago</button>
+                                    <button data-id="${app.id}" class="cancel-btn text-yellow-500 hover:text-yellow-400">Cancelar</button>
+                                `;
+                                break;
+                            case 'paid':
+                                statusBadge = `<span class="px-2 py-1 text-xs font-medium rounded-full bg-green-900 text-green-300">Pago</span>`;
+                                actionButton = `<span>-</span>`;
+                                break;
+                            case 'cancelled':
+                                statusBadge = `<span class="px-2 py-1 text-xs font-medium rounded-full bg-gray-700 text-gray-300">Cancelado</span>`;
+                                actionButton = `<button data-id="${app.id}" class="delete-appointment-btn text-red-500 hover:text-red-400">Excluir</button>`;
+                                break;
+                            default:
+                                statusBadge = `<span class="px-2 py-1 text-xs font-medium rounded-full bg-blue-900 text-blue-300">Pendente</span>`;
+                                actionButton = `<button data-id="${app.id}" class="cancel-btn text-yellow-500 hover:text-yellow-400">Cancelar</button>`;
+                        }
 
                         return `<tr class="border-b border-gray-700 hover:bg-gray-800">
                             <td class="p-4">${new Date(app.start_time).toLocaleString('pt-BR')}</td>
                             <td class="p-4">${app.client_name}</td>
-                            <td class="p-4">${app.client_phone}</td>
                             <td class="p-4">${app.services ? app.services.name : 'Serviço Removido'}</td>
                             <td class="p-4">${statusBadge}</td>
                             <td class="p-4 text-right">${actionButton}</td>
                         </tr>`;
                     };
 
-                    const activeAppointmentsHTML = activeAppointments.length > 0 
-                        ? activeAppointments.map(createAppointmentRowHTML).join('') 
-                        : `<tr><td colspan="6" class="p-4 text-center text-gray-500">Nenhum agendamento ativo encontrado.</td></tr>`;
+                    const confirmedHTML = confirmedAppointments.length > 0 ? confirmedAppointments.map(createAppointmentRowHTML).join('') : `<tr><td colspan="5" class="p-4 text-center text-gray-500">Nenhum agendamento confirmado.</td></tr>`;
+                    const paidHTML = paidAppointments.length > 0 ? paidAppointments.map(createAppointmentRowHTML).join('') : `<tr><td colspan="5" class="p-4 text-center text-gray-500">Nenhum agendamento pago.</td></tr>`;
+                    const cancelledHTML = cancelledAppointments.length > 0 ? cancelledAppointments.map(createAppointmentRowHTML).join('') : `<tr><td colspan="5" class="p-4 text-center text-gray-500">Nenhum agendamento cancelado.</td></tr>`;
 
-                    const cancelledAppointmentsHTML = cancelledAppointments.length > 0 
-                        ? cancelledAppointments.map(createAppointmentRowHTML).join('') 
-                        : `<tr><td colspan="6" class="p-4 text-center text-gray-500">Nenhum agendamento cancelado.</td></tr>`;
-
-                    const tableHeader = `<thead class="bg-gray-700/50"><tr><th class="p-4 font-semibold">Data e Hora</th><th class="p-4 font-semibold">Cliente</th><th class="p-4 font-semibold">Telefone</th><th class="p-4 font-semibold">Serviço</th><th class="p-4 font-semibold">Status</th><th class="p-4 font-semibold text-right">Ações</th></tr></thead>`;
+                    const tableHeader = `<thead class="bg-gray-700/50"><tr><th class="p-4 font-semibold">Data e Hora</th><th class="p-4 font-semibold">Cliente</th><th class="p-4 font-semibold">Serviço</th><th class="p-4 font-semibold">Status</th><th class="p-4 font-semibold text-right">Ações</th></tr></thead>`;
 
                     mainContent.innerHTML = `
                         <div class="space-y-8">
                             <div>
-                                <h1 class="text-3xl font-bold mb-6">Próximos Agendamentos</h1>
+                                <h1 class="text-3xl font-bold mb-6">Agendamentos Confirmados</h1>
                                 <div class="bg-gray-800 rounded-lg shadow-lg overflow-auto">
-                                    <table class="w-full text-left text-sm">${tableHeader}<tbody>${activeAppointmentsHTML}</tbody></table>
+                                    <table class="w-full text-left text-sm">${tableHeader}<tbody>${confirmedHTML}</tbody></table>
+                                </div>
+                            </div>
+                             <div>
+                                <h2 class="text-2xl font-bold mb-6">Agendamentos Finalizados (Pagos)</h2>
+                                <div class="bg-gray-800 rounded-lg shadow-lg overflow-auto">
+                                    <table class="w-full text-left text-sm">${tableHeader}<tbody>${paidHTML}</tbody></table>
                                 </div>
                             </div>
                             <div>
                                 <h2 class="text-2xl font-bold mb-6">Agendamentos Cancelados</h2>
                                 <div class="bg-gray-800 rounded-lg shadow-lg overflow-auto">
-                                    <table class="w-full text-left text-sm">${tableHeader}<tbody>${cancelledAppointmentsHTML}</tbody></table>
+                                    <table class="w-full text-left text-sm">${tableHeader}<tbody>${cancelledHTML}</tbody></table>
                                 </div>
                             </div>
                         </div>
@@ -825,6 +966,76 @@
                 } catch (error) {
                     console.error("Erro ao buscar agendamentos:", error);
                     mainContent.innerHTML = `<div class="text-red-400">Erro ao carregar agendamentos: ${error.message}</div>`;
+                }
+            }
+
+            async function renderCashFlowView() {
+                mainContent.innerHTML = `<h1 class="text-3xl font-bold mb-6">Fluxo de Caixa</h1><div id="cashflow-content"></div>`;
+                const contentEl = document.getElementById('cashflow-content');
+                contentEl.innerHTML = createLoaderHTML();
+
+                try {
+                    const { data: paidAppointments, error } = await supabase
+                        .from('appointments')
+                        .select(`client_name, start_time, services (name, price)`)
+                        .eq('status', 'paid')
+                        .order('start_time', { ascending: false });
+                    
+                    if (error) throw error;
+                    allPaidAppointments = paidAppointments; // Cache dos dados
+
+                    const now = new Date();
+                    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                    const startOfWeek = new Date(today);
+                    startOfWeek.setDate(today.getDate() - today.getDay());
+                    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+                    let todayRevenue = 0;
+                    let weekRevenue = 0;
+                    let monthRevenue = 0;
+
+                    paidAppointments.forEach(app => {
+                        const appDate = new Date(app.start_time);
+                        const price = app.services ? app.services.price : 0;
+                        
+                        if (appDate >= today) {
+                            todayRevenue += price;
+                        }
+                        if (appDate >= startOfWeek) {
+                            weekRevenue += price;
+                        }
+                        if (appDate >= startOfMonth) {
+                            monthRevenue += price;
+                        }
+                    });
+                    
+                    contentEl.innerHTML = `
+                        <div id="cashflow-summary-cards" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                            <div data-period="day" class="bg-gray-800 p-6 rounded-lg shadow-lg text-center cursor-pointer hover:bg-gray-700 transition-colors">
+                                <h3 class="text-sm font-medium text-gray-400 uppercase">Faturamento Hoje</h3>
+                                <p class="text-3xl font-bold text-white mt-2">${formatCurrency(todayRevenue)}</p>
+                            </div>
+                            <div data-period="week" class="bg-gray-800 p-6 rounded-lg shadow-lg text-center cursor-pointer hover:bg-gray-700 transition-colors">
+                                <h3 class="text-sm font-medium text-gray-400 uppercase">Faturamento Semana</h3>
+                                <p class="text-3xl font-bold text-white mt-2">${formatCurrency(weekRevenue)}</p>
+                            </div>
+                            <div data-period="month" class="bg-gray-800 p-6 rounded-lg shadow-lg text-center cursor-pointer hover:bg-gray-700 transition-colors">
+                                <h3 class="text-sm font-medium text-gray-400 uppercase">Faturamento Mês</h3>
+                                <p class="text-3xl font-bold text-white mt-2">${formatCurrency(monthRevenue)}</p>
+                            </div>
+                        </div>
+                    `;
+                    document.getElementById('cashflow-summary-cards').addEventListener('click', (e) => {
+                        const card = e.target.closest('[data-period]');
+                        if (card) {
+                            const period = card.dataset.period;
+                            showCashFlowDetailsModal(period, allPaidAppointments);
+                        }
+                    });
+
+                } catch (error) {
+                    console.error("Erro ao carregar fluxo de caixa:", error);
+                    contentEl.innerHTML = `<div class="text-red-400">Erro ao carregar dados do caixa: ${error.message}</div>`;
                 }
             }
 
@@ -963,7 +1174,7 @@
 
                 try {
                     const [appRes, blockedRes, openDayRes] = await Promise.all([
-                        supabase.from('appointments').select(`*, services(name, duration_minutes), client_name`).gte('start_time', new Date(dateStringStart).toISOString()).lt('start_time', new Date(dateStringEnd).toISOString()).in('status', ['pending', 'confirmed']),
+                        supabase.from('appointments').select(`*, services(name, duration_minutes), client_name`).gte('start_time', new Date(dateStringStart).toISOString()).lt('start_time', new Date(dateStringEnd).toISOString()).in('status', ['pending', 'confirmed', 'paid']),
                         supabase.from('blocked_slots').select(`*`).gte('slot_time', new Date(dateStringStart).toISOString()).lt('slot_time', new Date(dateStringEnd).toISOString()),
                         supabase.from('open_days').select('open_date').eq('open_date', dateString).maybeSingle()
                     ]);
@@ -1015,7 +1226,7 @@
 
                     const bookedAppointment = appointments.find(app => {
                         const appStart = new Date(app.start_time);
-                        const appEnd = new Date(appStart.getTime() + app.services.duration_minutes * 60000);
+                        const appEnd = new Date(appStart.getTime() + (app.services ? app.services.duration_minutes : 0) * 60000);
                         return slotStart < appEnd && new Date(slotStart.getTime() + 60 * 60000) > appStart;
                     });
                     const blockedSlot = blockedSlots.find(bs => new Date(bs.slot_time).getTime() === slotStart.getTime());
@@ -1029,7 +1240,8 @@
 
                     if (bookedAppointment) {
                         statusClass = 'booked';
-                        statusText = 'AGENDADO';
+                        statusText = bookedAppointment.status === 'paid' ? 'PAGO' : 'AGENDADO';
+                        if (bookedAppointment.status === 'paid') slotElement.style.backgroundColor = 'var(--green-paid)';
                         detailsHTML = `<p class="text-xs text-white/70 truncate" title="${bookedAppointment.client_name}">${bookedAppointment.client_name}</p>`;
                     } else if (blockedSlot) {
                         statusClass = 'closed';
@@ -1081,7 +1293,7 @@
             }
 
             async function handleAdminActions(e) {
-                const target = e.target.closest('.cancel-btn, .edit-service-btn, .delete-service-btn, .delete-appointment-btn');
+                const target = e.target.closest('.cancel-btn, .edit-service-btn, .delete-service-btn, .delete-appointment-btn, .mark-paid-btn');
                 if (!target) return;
 
                 const id = target.dataset.id;
@@ -1106,7 +1318,7 @@
                     document.getElementById('cancel-edit-btn').classList.remove('hidden');
                 }
                 if (target.classList.contains('cancel-btn')) {
-                    showAdminConfirm('Cancelar Agendamento?', 'Tem certeza que deseja cancelar este agendamento? O cliente não será notificado automaticamente.', async () => {
+                    showAdminConfirm('Cancelar Agendamento?', 'Tem certeza que deseja cancelar este agendamento?', async () => {
                         const { error } = await supabase.from('appointments').update({ status: 'cancelled' }).eq('id', id);
                         if (error) showToast(`Erro ao cancelar: ${error.message}`, 'error');
                         else {
@@ -1126,6 +1338,17 @@
                         }
                     }, 'delete');
                 }
+                 if (target.classList.contains('mark-paid-btn')) {
+                    showAdminConfirm('Confirmar Pagamento?', 'Isso marcará o agendamento como pago e o moverá para o histórico.', async () => {
+                        const { error } = await supabase.from('appointments').update({ status: 'paid' }).eq('id', id);
+                        if (error) {
+                            showToast(`Erro ao marcar como pago: ${error.message}`, 'error');
+                        } else {
+                            showToast('Agendamento marcado como pago!', 'success');
+                            renderAppointmentsView();
+                        }
+                    });
+                }
             }
             
             function resetServiceForm() {
@@ -1135,6 +1358,7 @@
                 document.getElementById('cancel-edit-btn').classList.add('hidden');
             }
 
+            // --- Inicialização e Event Listeners ---
             loginForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 loginError.classList.add('hidden');
@@ -1151,13 +1375,14 @@
             goToSiteLink.addEventListener('click', (e) => { e.preventDefault(); window.location.hash = ''; handleRouting(); });
             mainContent.addEventListener('click', handleAdminActions);
             
+            mobileMenuButton.addEventListener('click', toggleSidebar);
+            mobileMenuBackdrop.addEventListener('click', toggleSidebar);
+
             navLinks.forEach(link => {
                 link.addEventListener('click', (e) => {
-                    if (e.currentTarget.id.startsWith('nav-')) {
-                        e.preventDefault();
-                        const view = e.currentTarget.id.replace('nav-', '');
-                        navigate(view);
-                    }
+                    e.preventDefault();
+                    const view = e.currentTarget.id.replace('nav-', '');
+                    navigate(view);
                 });
             });
 
